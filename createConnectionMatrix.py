@@ -52,7 +52,7 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
             if (x >= imgLength) or (y >= imgHeight) or (x < 0) or (y < 0):
                 continue
             # Calculate which pixel number it is to add to the map.    
-            pixelLoc = (x-1) * imgLength + (y-1)
+            pixelLoc = (y-1) * imgLength + (x-1)
             
             if (connectionMatrix[currHiddenUnit][pixelLoc] == 1):
                 continue
