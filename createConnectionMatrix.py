@@ -19,6 +19,9 @@
 #  h x p matrix, which has zeroes everywhere except for the locations with a   #
 #  connection between the hidden unit and the pixel, where the value is 1.     #
 #                                                                              #
+#  Example Input:                                                              #
+#  createConnectionMatrix([21, 21], np.array([[1,2], [9,10], [21,21]]),        #
+#                         10, [[2, 0], [0,2]])                                 #
 #==============================================================================#
 
 def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):    
