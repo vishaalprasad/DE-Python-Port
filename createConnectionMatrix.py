@@ -26,22 +26,24 @@ import numpy as np
 #==============================================================================#
 
 def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):    
+    
     ## Define some useful local variables for sake of clarity ##
     imgHeight = imageSize[0]
     imgLength = imageSize[1]
     numPixels = imgHeight * imgLength 
     numHiddenUnits = hiddenUnitLocs.shape[1] + 1 #zero-based so add one
     
-    
-    ## Initialize the Connection Matrix ##
+    ## Initialize the Connection Matrix to all zeroes ##
     connectionMatrix = np.zeros(shape=(numHiddenUnits,numPixels))
     
-    currHiddenUnit = 0
+    currHiddenUnit = 0 # index to keep track of which hidden unit we're working on.
+    
     ## Loop through the Hidden Units to Create Samples ##
     for k in hiddenUnitLocs:
+        
         i = 0
-        # 10 Samples for each Matrix
         while i < numConnections:
+            
             # Get random Gaussian sample which returns an array of tuples
             [[x, y]] = np.random.multivariate_normal(k, sigma, 1)
             
@@ -52,6 +54,7 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
             # Check to see if it's out of bounds.
             if (x >= imgLength) or (y >= imgHeight) or (x < 0) or (y < 0):
                 continue
+            
             # Calculate which pixel number it is to add to the map.    
             pixelLoc = (y-1) * imgLength + (x-1)
             
