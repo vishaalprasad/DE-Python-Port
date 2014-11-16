@@ -67,3 +67,19 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
         currHiddenUnit += 1        
     
     return connectionMatrix
+
+## Basic function to check equality of floating point numbers ##
+def approx_equal(a, b, epsilon=0.000000001):
+     return abs(a - b) < epsilon
+
+## Basic tester that makes sure that the connectionMatrix has the 
+## correct amount of connections for now. Rest of checking was done manually.
+def testConnectionMatrix(matrix, numConnection, numHiddenUnit):
+    print matrix.shape
+    connectionCounter = 0
+    for (x,y), value in np.ndenumerate(matrix):
+        if approx_equal(value, 1.0):
+            print "found a 1"
+            connectionCounter += 1
+     
+    assert numConnection * numHiddenUnit == connectionCounter 
