@@ -25,61 +25,76 @@ import numpy as np
 #                         10, [[2, 0], [0,2]])                                 #
 #==============================================================================#
 
-def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):    
-    
+def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
+
     ## Define some useful local variables for sake of clarity ##
     imgHeight = imageSize[0]
     imgLength = imageSize[1]
-    numPixels = imgHeight * imgLength 
+    numPixels = imgHeight * imgLength
     numHiddenUnits = hiddenUnitLocs.shape[1] + 1 #zero-based so add one
-    
+
     ## Initialize the Connection Matrix to all zeroes ##
     connectionMatrix = np.zeros(shape=(numHiddenUnits,numPixels))
-    
     currHiddenUnit = 0 # index to keep track of which hidden unit we're working on.
-    
+
     ## Loop through the Hidden Units to Create Samples ##
     for k in hiddenUnitLocs:
-        
+
         i = 0
         while i < numConnections:
-            
+
             # Get random Gaussian sample which returns an array of tuples
             [[x, y]] = np.random.multivariate_normal(k, sigma, 1)
-            
+            print "Got sample (%2d, %2d) from Gaussian with mean %s, std %s" % (x, y, k, sigma)
+
             # Round the sample to nearest integer
             x = round(x, 0)
             y = round(y, 0)
-            
+
             # Check to see if it's out of bounds.
             if (x >= imgLength) or (y >= imgHeight) or (x < 0) or (y < 0):
                 continue
-            
-            # Calculate which pixel number it is to add to the map.    
+
+            # Calculate which pixel number it is to add to the map.
             pixelLoc = (y-1) * imgLength + (x-1)
-            
+
             if (connectionMatrix[currHiddenUnit][pixelLoc] == 1):
                 continue
 
             connectionMatrix[currHiddenUnit][pixelLoc] = 1
             i += 1
-        
-        currHiddenUnit += 1        
-    
+
+        currHiddenUnit += 1
+
     return connectionMatrix
 
 ## Basic function to check equality of floating point numbers ##
 def approx_equal(a, b, epsilon=0.000000001):
      return abs(a - b) < epsilon
 
-## Basic tester that makes sure that the connectionMatrix has the 
+## Basic tester that makes sure that the connectionMatrix has the
 ## correct amount of connections for now. Rest of checking was done manually.
 def testConnectionMatrix(matrix, numConnection, numHiddenUnit):
-    print matrix.shape
     connectionCounter = 0
-    for (x,y), value in np.ndenumerate(matrix):
+    for (r,c), value in np.ndenumerate(matrix):
         if approx_equal(value, 1.0):
-            print "found a 1"
+            print "Hidden unit # %2d: Connection at %s" % (r, np.unravel_index(c, imageSize),)
+
             connectionCounter += 1
-     
-    assert numConnection * numHiddenUnit == connectionCounter 
+
+    assert numConnection * numHiddenUnit == connectionCounter
+
+
+if __name__ == "__main__":
+
+    # Three test cases:
+    # 1.
+
+    # 1. square image, single unit at center.
+    nConns = 10
+    imageSize = (20, 20)
+    hiddenUnitLocs = np.asarray(((11, 11),))
+    sigma = [[20, 0],[0, 20]]
+    mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, sigma)
+
+    testConnectionMatrix(mat, nConns, 1)
