@@ -31,7 +31,7 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
     imgHeight = imageSize[0]
     imgLength = imageSize[1]
     numPixels = imgHeight * imgLength
-    numHiddenUnits = hiddenUnitLocs.shape[1] + 1 #zero-based so add one
+    numHiddenUnits = len(hiddenUnitLocs)
 
     ## Initialize the Connection Matrix to all zeroes ##
     connectionMatrix = np.zeros(shape=(numHiddenUnits,numPixels))
@@ -45,7 +45,6 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
 
             # Get random Gaussian sample which returns an array of tuples
             [[x, y]] = np.random.multivariate_normal(k, sigma, 1)
-            print "Got sample (%2d, %2d) from Gaussian with mean %s, std %s" % (x, y, k, sigma)
 
             # Round the sample to nearest integer
             x = round(x, 0)
@@ -56,11 +55,11 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
                 continue
 
             # Calculate which pixel number it is to add to the map.
-            pixelLoc = (y-1) * imgLength + (x-1)
+            pixelLoc = (y) * imgLength + (x)
 
             if (connectionMatrix[currHiddenUnit][pixelLoc] == 1):
                 continue
-
+            print "Using sample (%2d, %2d) from Gaussian with mean %s, std %s" % (x, y, k, sigma)
             connectionMatrix[currHiddenUnit][pixelLoc] = 1
             i += 1
 
