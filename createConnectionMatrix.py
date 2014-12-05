@@ -129,15 +129,15 @@ if __name__ == "__main__":
     doTest(testName="single unit at center.",
         nConns=10,
         imageSize=(20, 20),
-        hiddenUnitLocs=np.asarray(((11, 11),)),
+        hiddenUnitLocs=np.asarray(((10, 10),)),
         sigma = [[20, 0],[0, 20]])
 
 
     # 2. square image, four units symmetrical about the center
     doTest(testName="four units symmetrical about the center",
-        nConns = 24,
-        imageSize = (80, 80),
-        hiddenUnitLocs = np.array([[15, 40], [40, 15], [40, 65], [65, 40]]),
+        nConns=24,
+        imageSize=(80, 80),
+        hiddenUnitLocs = np.array([[14, 39], [39, 14], [39, 64], [64, 39]]),
         sigma = [[15, 0], [0, 15]])
 
     # 3. square image, four units at each corner
@@ -151,5 +151,5 @@ if __name__ == "__main__":
     doTest(testName="3 hidden units, connecting to all pixels",
         nConns = 12,
         imageSize = (4, 3),
-        hiddenUnitLocs = np.array([[0,0], [2,3], [3,2]]),
+        hiddenUnitLocs = np.array([[0,0], [2,2], [3,2]]),
         sigma = [[1, 0], [0, 1]])
