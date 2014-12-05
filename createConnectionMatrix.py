@@ -108,60 +108,48 @@ def graphConnectionMatrix(matrix, imageSize, hiddenUnitLocs):
     plt.show()
 
 
+
+def doTest(testName, nConns, imageSize, hiddenUnitLocs, sigma):
+
+    print "---------------------------\n"
+    print "\n%s:\n" % testName
+
+    mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, sigma)
+
+    print "\nTesting and Graphing Resulting Matrix:\n"
+    testConnectionMatrix(mat, nConns, len(hiddenUnitLocs), imageSize)
+    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
+
+
 if __name__ == "__main__":
 
     # Three test cases:
 
     # 1. square image, single unit at center.
-    print "\nTEST #1:\n"
+    doTest(testName="single unit at center.",
+        nConns=10,
+        imageSize=(20, 20),
+        hiddenUnitLocs=np.asarray(((11, 11),)),
+        sigma = [[20, 0],[0, 20]])
 
-    nConns = 10
-    imageSize = (20, 20)
-    hiddenUnitLocs = np.asarray(((11, 11),))
-    sigma = [[20, 0],[0, 20]]
-    mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, sigma)
-
-    print "\nTesting and Graphing Resulting Matrix:\n"
-    testConnectionMatrix(mat, nConns, 1, imageSize)
-    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
 
     # 2. square image, four units symmetrical about the center
-    print "---------------------------\n"
-    print "TEST #2:\n"
-
-    nConns = 24
-    imageSize = (80, 80)
-    hiddenUnitLocs = np.array([[15, 40], [40, 15], [40, 65], [65, 40]])
-    sigma = [[15, 0], [0, 15]]
-    mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, sigma)
-
-    print "\nTesting and Graphing Resulting Matrix:\n"
-    testConnectionMatrix(mat, nConns, 4, imageSize)
-    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
+    doTest(testName="four units symmetrical about the center",
+        nConns = 24,
+        imageSize = (80, 80),
+        hiddenUnitLocs = np.array([[15, 40], [40, 15], [40, 65], [65, 40]]),
+        sigma = [[15, 0], [0, 15]])
 
     # 3. square image, four units at each corner
-    print "---------------------------\n"
-    print "TEST #3:\n"
-
-    nConns = 15
-    imageSize = (50, 50)
-    hiddenUnitLocs = np.array([[0, 0], [49, 0], [0, 49], [49, 49]]) #four corners
-    sigma = [[10, 0], [0, 10]]
-    mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, sigma)
-
-    print "\nTesting and Graphing Resulting Matrix:\n"
-    testConnectionMatrix(mat, nConns, 4, imageSize)
-    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
+    doTest(testName="four units at each corner",
+        nConns = 15,
+        imageSize = (50, 50),
+        hiddenUnitLocs = np.array([[0, 0], [49, 0], [0, 49], [49, 49]]), #four corners
+        sigma = [[10, 0], [0, 10]])
 
     # 4. small image, three units, 12 connections, 12 pixels. each pixel maps to each hidden unit
-    print "---------------------------\n"
-    print "TEST #3:\n"
-    nConns = 12
-    imageSize = (4, 3)
-    hiddenUnitLocs = np.array([[0,0], [2,3], [3,2]])
-    sigma = [[1, 0], [0, 1]]
-    mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, sigma)
-
-    print "\nTesting and Graphing Resulting Matrix:\n"
-    testConnectionMatrix(mat, nConns, 3, imageSize)
-    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
+    doTest(testName="3 hidden units, connecting to all pixels",
+        nConns = 12,
+        imageSize = (4, 3),
+        hiddenUnitLocs = np.array([[0,0], [2,3], [3,2]]),
+        sigma = [[1, 0], [0, 1]])
