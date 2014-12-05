@@ -90,16 +90,22 @@ def testConnectionMatrix(matrix, numConnection, numHiddenUnit, imageSize):
 
 # Graph a matrix on the Cartesian Plane, with a marking at any location there's a connection
 # Note: Currently no way to determine which hidden unit(s) any pixel maps to.
-def graphConnectionMatrix(matrix, imageSize):
+def graphConnectionMatrix(matrix, imageSize, hiddenUnitLocs):
     plt.figure() #create new window for graph
-    #Plot all the points
+
+    # Plot all of the hidden unit locations
+    for x,y in hiddenUnitLocs:
+        plt.plot(x,y,'ro');
+
+    # Plot all the connection points
     for (r,c), value in np.ndenumerate(matrix):
         if approx_equal(value, 1.0):
             [x,y] = np.unravel_index(c, imageSize)
-            plt.plot(x,y,'x');
-            print [x, y]
-            plt.axis([0, imageSize[0]-1, 0, imageSize[1]-1]); plt.show()
+            plt.plot(x,y,'bx');
+            #print [x, y]
 
+    plt.axis([-1, imageSize[0], -1, imageSize[1]]);
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -117,7 +123,7 @@ if __name__ == "__main__":
 
     print "\nTesting and Graphing Resulting Matrix:\n"
     testConnectionMatrix(mat, nConns, 1, imageSize)
-    graphConnectionMatrix(mat, imageSize)
+    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
 
     # 2. square image, four units symmetrical about the center
     print "---------------------------\n"
@@ -131,7 +137,7 @@ if __name__ == "__main__":
 
     print "\nTesting and Graphing Resulting Matrix:\n"
     testConnectionMatrix(mat, nConns, 4, imageSize)
-    graphConnectionMatrix(mat, imageSize)
+    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
 
     # 3. square image, four units at each corner
     print "---------------------------\n"
@@ -145,7 +151,7 @@ if __name__ == "__main__":
 
     print "\nTesting and Graphing Resulting Matrix:\n"
     testConnectionMatrix(mat, nConns, 4, imageSize)
-    graphConnectionMatrix(mat, imageSize)
+    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
 
     # 4. small image, three units, 12 connections, 12 pixels. each pixel maps to each hidden unit
     print "---------------------------\n"
@@ -158,4 +164,4 @@ if __name__ == "__main__":
 
     print "\nTesting and Graphing Resulting Matrix:\n"
     testConnectionMatrix(mat, nConns, 3, imageSize)
-    graphConnectionMatrix(mat, imageSize)
+    graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
