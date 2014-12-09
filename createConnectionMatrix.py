@@ -180,7 +180,10 @@ if __name__ == "__main__":
         variance = [[10, 0], [0, 10]])
 
     # 4. small image, three units, 12 connections, 12 pixels. each pixel maps to each hidden unit
-    if (myTest != doRatioTest):
+    
+    # This test is too slow for automatic ratio test.
+    # Comment out condition manually if you specifically want to try the ratio test on this test case.
+    if (myTest != doRatioTest): 
         myTest(testName="3 hidden units, connecting to all pixels",
             nConns = 12,
             imageSize = (4, 3),
