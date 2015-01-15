@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 #  Parameters:  imageSize is a tuple with positive integers.                   #
 #               hiddenUnitLocs is an n x 2 numpy array                         #
 #               numConnections is the number of connections per hidden unit    #
-#               sigma is the standard deviation matrix used in the Gaussian    #
+#               variance is the covariance matrix used in the Gaussian         #
 #                                                                              #
 #  Return Value: This function returns the connectivity matrix, which is an    #
 #  h x p matrix, which has zeroes everywhere except for the locations with a   #
@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 #                         10, [[2, 0], [0,2]])                                 #
 #==============================================================================#
 
-def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
+def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, variance):
 
     ## Define some useful local variables for sake of clarity ##
     imgHeight = imageSize[0]
@@ -45,7 +45,7 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
         while i < numConnections:
 
             # Get random Gaussian sample which returns an array of tuples
-            [[x, y]] = np.random.multivariate_normal(k, sigma, 1)
+            [[x, y]] = np.random.multivariate_normal(k, variance, 1)
 
             # Round the sample to nearest integer
             x = round(x, 0)
@@ -60,7 +60,8 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
 
             if (connectionMatrix[currHiddenUnit][pixelLoc] == 1):
                 continue
-            print "Using sample (%2d, %2d) from Gaussian with mean %s, std %s" % (x, y, k, sigma)
+            #print "Using sample (%2d, %2d) from Gaussian with mean %s, std %s" % (x, y, k, variance)
+
             connectionMatrix[currHiddenUnit][pixelLoc] = 1
             i += 1
 
@@ -88,8 +89,7 @@ def testConnectionMatrix(matrix, numConnection, numHiddenUnit, imageSize):
         print "Expected num of connections: %d.\n Received: %d." % (numConnection * numHiddenUnit, connectionCounter)
         exit(1)
 
-# Graph a matrix on the Cartesian Plane, with a marking at any location there's a connection
-# Note: Currently no way to determine which hidden unit(s) any pixel maps to.
+# Graph a matrix on the Cartesian Plane, with a marking at any location there's a connection or a hidden unit
 def graphConnectionMatrix(matrix, imageSize, hiddenUnitLocs):
     plt.figure() #create new window for graph
 
@@ -109,47 +109,83 @@ def graphConnectionMatrix(matrix, imageSize, hiddenUnitLocs):
 
 
 
-def doTest(testName, nConns, imageSize, hiddenUnitLocs, sigma):
+def doTest(testName, nConns, imageSize, hiddenUnitLocs, variance):
 
     print "---------------------------\n"
     print "\n%s:\n" % testName
 
-    mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, sigma)
+    mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, variance)
 
     print "\nTesting and Graphing Resulting Matrix:\n"
     testConnectionMatrix(mat, nConns, len(hiddenUnitLocs), imageSize)
     graphConnectionMatrix(mat, imageSize, hiddenUnitLocs)
 
 
+def doRatioTest(testName, nConns, imageSize, hiddenUnitLocs, variance):
+
+    print "---------------------------\n"
+    print "\n%s:\n" % testName
+
+    ratioOfConnections = 0.0
+    numTrials = 100
+    for i in range(0, numTrials):
+        mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, variance)
+        ratioOfConnections += getPropOfHUwithSample(mat, hiddenUnitLocs, imageSize)
+    ratioOfConnections = ratioOfConnections / numTrials
+    print "Ratio is: " + str(ratioOfConnections)
+
+
+# Given a matrix and the hidden unit locations, find the proportion of hidden
+# units that also have a sample at their locaiton.
+def getPropOfHUwithSample(matrix, hiddenUnitLocs, imageSize):
+    numHULocs = len(hiddenUnitLocs)
+    numSampleAtHULoc = 0 #counter
+    for (r,c), value in np.ndenumerate(matrix):
+        if approx_equal(value, 1.0):
+            [x,y] = np.unravel_index(c, imageSize) #current sample
+            b = hiddenUnitLocs[r] #get the current hidden unit
+
+            if (x == b[1] and y == b[0]):
+
+                numSampleAtHULoc += 1
+    return numSampleAtHULoc / float(numHULocs) #get the proportion
+
+
 if __name__ == "__main__":
 
-    # Three test cases:
+    myTest = doTest #variable to easily switch between tests
+
+    # Four test cases:
 
     # 1. square image, single unit at center.
-    doTest(testName="single unit at center.",
+    myTest(testName="single unit at center",
         nConns=10,
         imageSize=(20, 20),
         hiddenUnitLocs=np.asarray(((10, 10),)),
-        sigma = [[20, 0],[0, 20]])
+        variance = [[20, 0],[0, 20]])
 
 
     # 2. square image, four units symmetrical about the center
-    doTest(testName="four units symmetrical about the center",
+    myTest(testName="four units symmetrical about the center",
         nConns=24,
         imageSize=(80, 80),
         hiddenUnitLocs = np.array([[14, 39], [39, 14], [39, 64], [64, 39]]),
-        sigma = [[15, 0], [0, 15]])
+        variance = [[15, 0], [0, 15]])
 
     # 3. square image, four units at each corner
-    doTest(testName="four units at each corner",
+    myTest(testName="four units at each corner",
         nConns = 15,
         imageSize = (50, 50),
         hiddenUnitLocs = np.array([[0, 0], [49, 0], [0, 49], [49, 49]]), #four corners
-        sigma = [[10, 0], [0, 10]])
+        variance = [[10, 0], [0, 10]])
 
     # 4. small image, three units, 12 connections, 12 pixels. each pixel maps to each hidden unit
-    doTest(testName="3 hidden units, connecting to all pixels",
-        nConns = 12,
-        imageSize = (4, 3),
-        hiddenUnitLocs = np.array([[0,0], [2,2], [3,2]]),
-        sigma = [[1, 0], [0, 1]])
+    
+    # This test is too slow for automatic ratio test.
+    # Comment out condition manually if you specifically want to try the ratio test on this test case.
+    if (myTest != doRatioTest): 
+        myTest(testName="3 hidden units, connecting to all pixels",
+            nConns = 12,
+            imageSize = (4, 3),
+            hiddenUnitLocs = np.array([[0,0], [2,2], [3,2]]),
+            variance = [[1, 0], [0, 1]])
