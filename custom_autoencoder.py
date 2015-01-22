@@ -10,7 +10,7 @@ from pylearn2.linear.matrixmul import MatrixMul
 
 class CustomDenoisingAutoencoder(DenoisingAutoencoder):
     """
-    A denoising autoencoder 
+    A denoising autoencoder
 
     Parameters
     ----------
@@ -25,7 +25,7 @@ class CustomDenoisingAutoencoder(DenoisingAutoencoder):
 
         super(CustomDenoisingAutoencoder, self).__init__(
                 corruptor,
-                nvis, 
+                nvis,
                 nhid,
                 act_enc,
                 act_dec,
@@ -78,14 +78,14 @@ class CustomDenoisingAutoencoder(DenoisingAutoencoder):
 
                 if (connectionMatrix[currHiddenUnit][pixelLoc] == 1):
                     continue
-            
+
                 connectionMatrix[currHiddenUnit][pixelLoc] = 1
                 i += 1
 
             currHiddenUnit += 1
 
         return connectionMatrix
-    
+
 
 
     @functools.wraps(Model._modify_updates)
@@ -95,4 +95,6 @@ class CustomDenoisingAutoencoder(DenoisingAutoencoder):
             updates[W] = updates[W] * self.mask
 
 
-
+if __name__ == "__main__":
+    from pylearn2.scripts.train import train
+    train(config="custom.yaml")
