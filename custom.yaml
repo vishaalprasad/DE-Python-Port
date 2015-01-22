@@ -1,8 +1,8 @@
  !obj:pylearn2.train.Train {
-        "dataset": &train !obj:pylearn2.datasets.vanhateren.VANHATEREN {
+        "dataset": &train !obj:vanhateren.VANHATEREN {
             "which_set": 'train',
         },
-        "model": !obj:pylearn2.models.custom_autoencoder.CustomDenoisingAutoencoder {
+        "model": !obj:custom_autoencoder.CustomDenoisingAutoencoder {
             "nhid" : 1,
             "nvis" : 1024,
             "irange" : 0.05,
@@ -10,12 +10,12 @@
                 "corruption_level": 0.5,
             },
             "act_enc": "tanh",
-            "act_dec": null,    # Linear activation on the decoder side. 
+            "act_dec": null,    # Linear activation on the decoder side.
 
             "numCons" : 16,
             "sigma" : [[3, 0], [0, 3]],
             "imageSize" : [32, 32],
-            
+
         },
         algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
             "learning_rule": !obj:pylearn2.training_algorithms.learning_rule.Momentum { "init_momentum": 0.9 },
@@ -23,12 +23,12 @@
             "learning_rate": .01,
             "monitoring_dataset":
                 {
-                    'valid' : !obj:pylearn2.datasets.vanhateren.VANHATEREN {
+                    'valid' : !obj:vanhateren.VANHATEREN {
                                   "which_set": 'train',
                                   #"start": 0,
                                   #"stop":  199,
                               },
-                    'test'  : !obj:pylearn2.datasets.vanhateren.VANHATEREN {
+                    'test'  : !obj:vanhateren.VANHATEREN {
                                   "which_set": 'test',
                               },
                 },
