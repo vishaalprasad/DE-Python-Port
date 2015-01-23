@@ -1,7 +1,5 @@
  !obj:pylearn2.train.Train {
-        "dataset": &train !obj:vanhateren.VANHATEREN {
-            "which_set": 'train',
-        },
+        "dataset": !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/train.pkl",
         "model": !obj:custom_autoencoder.CustomDenoisingAutoencoder {
             "nhid" : 1,
             "nvis" : 1024,
@@ -23,14 +21,8 @@
             "learning_rate": .01,
             "monitoring_dataset":
                 {
-                    'valid' : !obj:vanhateren.VANHATEREN {
-                                  "which_set": 'train',
-                                  #"start": 0,
-                                  #"stop":  199,
-                              },
-                    'test'  : !obj:vanhateren.VANHATEREN {
-                                  "which_set": 'test',
-                              },
+                    'valid' : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/valid.pkl",
+                    'test'  : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/test.pkl",
                 },
             "cost" : !obj:pylearn2.costs.autoencoder.MeanSquaredReconstructionError {},
             "termination_criterion": !obj:pylearn2.termination_criteria.EpochCounter {
