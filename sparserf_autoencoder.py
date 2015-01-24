@@ -27,33 +27,41 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
 
         """
         super(SparseRFAutoencoder, self).__init__(nhid=nhid, **kwargs)
-        hiddenUnitLocs = self._createHiddenUnits(nhid, imageSize)
-        matrix = self._createConnectionMatrix(imageSize, hiddenUnitLocs, numCons, sigma)
-        self.mask = matrix.transpose()
+        self.numCons = numCons
+        self.sigma = sigma
+        self.imageSize = imageSize
 
-    def _createHiddenUnits(self, numHiddenUnits, imageSize):
-        return np.array([[16, 16]])
+        self._set_hidden_unit_locations()
+        self.mask = self._create_connection_mask()
 
-    def _createConnectionMatrix(self, imageSize, hiddenUnitLocs, numConnections, sigma):
+    def __str__(self):
+        props_to_print = dict([(prop_name, getattr(self, prop_name))
+                                for prop_name in ['nhid', 'numCons', 'sigma']])
 
+        return "%s(%s)" % (self.__class__.__name__, props_to_print)
+
+    def _set_hidden_unit_locations(self):
+        self.hiddenUnitLocs = np.round(self.imageSize / 2)
+
+    def _create_connection_mask(self):
         ## Define some useful local variables for sake of clarity ##
-        imgHeight = imageSize[0]
-        imgLength = imageSize[1]
+        imgHeight = self.imageSize[0]
+        imgLength = self.imageSize[1]
         numPixels = imgHeight * imgLength
-        numHiddenUnits = len(hiddenUnitLocs)
+        numHiddenUnits = self.hiddenUnitLocs.shape[0]
 
         ## Initialize the Connection Matrix to all zeroes ##
         connectionMatrix = np.zeros(shape=(numHiddenUnits,numPixels))
         currHiddenUnit = 0 # index to keep track of which hidden unit we're working on.
 
         ## Create a variance parameter by squaring each element in sigma, used in Gaussian ##
-        variance = [[elem * elem for elem in inner] for inner in sigma]
+        variance = [[elem * elem for elem in inner] for inner in self.sigma]
 
         ## Loop through the Hidden Units to Create Samples ##
-        for k in hiddenUnitLocs:
+        for k in self.hiddenUnitLocs:
 
             i = 0
-            while i < numConnections:
+            while i < self.numCons:
 
                 # Get random Gaussian sample which returns an array of tuples
                 [[x, y]] = np.random.multivariate_normal(k, variance, 1)
