@@ -25,10 +25,10 @@ def create_datasets(datasets=ALL_DATASETS, output_dir=DATA_DIR, overwrite=False)
             print("Loading the %s data" % dataset_name)
             dataset = VANHATEREN(which_set=dataset_name)
 
-            print("Saving the test data")
+            print("Saving the %d data" % dataset_name)
             dataset.use_design_loc(output_files['npy'])
             serial.save(output_files['pkl'], dataset)
 
 
 if __name__ == "__main__":
-    create_datasets()
+    create_datasets(overwrite=True)
