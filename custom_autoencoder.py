@@ -96,17 +96,8 @@ class CustomDenoisingAutoencoder(DenoisingAutoencoder):
 
 
 if __name__ == "__main__":
-    from pylearn2.utils import string_utils
-    data_dir = string_utils.preprocess('${PYLEARN2_DATA_PATH}/vanhateren')
-
-    import os
-    if os.path.isfile(data_dir+'/valid.pkl') is False \
-        or os.path.isfile(data_dir+'/test.pkl') is False \
-        or os.path.isfile(data_dir+'/train.pkl') is False:
-        import dataset
-        dataset.create_datasets()
+    import dataset
+    dataset.create_datasets()
 
     from pylearn2.scripts.train import train
     train(config="custom.yaml")
-
-
