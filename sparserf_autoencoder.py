@@ -8,22 +8,29 @@ from pylearn2.linear.matrixmul import MatrixMul
 
 
 
-class CustomDenoisingAutoencoder(DenoisingAutoencoder):
+class SparseRFAutoencoder(DenoisingAutoencoder):
     """
-    A denoising autoencoder
+    A denoising autoencoder with sparse local receptive fields.
+    """
 
-    Parameters
-    ----------
-    See: DenoisingAutoencoder's parameters
-    nhid = number of hidden units
-    numCons = number of connections per hidden unit
-    sigma = standard deviation matrix
-    imageSize = size of an image
-        """
     def __init__(self, nhid, numCons, sigma, imageSize, corruptor,
             act_enc, act_dec, nvis, tied_weights=False, irange=1e-3, rng=9001):
+        """
+        Parameters:
+        ----------
 
-        super(CustomDenoisingAutoencoder, self).__init__(
+        nhid: number of hidden units
+
+        numCons: number of connections per hidden unit
+
+        sigma: standard deviation matrix
+
+        imageSize = size of an image
+
+        """
+
+
+        super(SparseRFAutoencoder, self).__init__(
                 corruptor,
                 nvis,
                 nhid,
