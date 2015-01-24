@@ -41,7 +41,49 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         return "%s(%s)" % (self.__class__.__name__, props_to_print)
 
     def _set_hidden_unit_locations(self):
+        """
+        This resizes the image to an image with as many
+        hidden units as there are pixels to place.
+        Then the code expands the reduced image back out to
+        compute the hidden unit locations.
+        """
+
         self.hiddenUnitLocs = np.array([np.round(self.imageSize / 2)])
+
+        imgHeight = self.imageSize[0]
+        imgLength = self.imageSize[1]
+        numPixels = imgHeight * imgLength
+        numHiddenUnits = self.hiddenUnitLocs.shape[0]
+
+        # Determine the scaling
+        scalefactor = numPixels/self.nhid
+        assert scalefactor >= 1., 'nhid or hidden_units_per_layer is off; %d units requested in %d locations/pixels!' % (self.nhid, numPixels)
+        newgrid = np.array(np.round(self.imageSize / np.sqrt(scalefactor)), dtype=int)
+        assert np.prod(newgrid) == self.nhid, "can't fit; npixels / nhid must be a square (4, 9, 16, etc.)"
+
+        # Set up the hidden unit positions in the smaller grid
+        [X, Y] = np.meshgrid(range(newgrid[1]),range(newgrid[0]))
+        X = X * np.sqrt(scalefactor)
+        Y = Y * np.sqrt(scalefactor)
+
+        # Expand the smaller grid back out to the larger grid
+        X = X + (np.sqrt(scalefactor)) / 2 - 0.5
+        Y = Y + (np.sqrt(scalefactor)) / 2 - 0.5
+
+        # Turn into rounded column vectors
+        X = np.ravel(np.round(X)).astype(int)
+        Y = np.ravel(np.round(Y)).astype(int)
+
+        # Create the outputs from the grids
+        connection_matrix = np.zeros(self.imageSize, dtype=bool)
+        connection_matrix[Y, X] = True
+        import matplotlib.pyplot as plt
+        plt.imshow(connection_matrix)
+        plt.title('connection matrix')
+        plt.show()
+        assert np.count_nonzero(connection_matrix) == self.nhid, '# of requested locations must match the # of provided locations!'
+
+        return connection_matrix
 
     def _create_connection_mask(self):
         ## Define some useful local variables for sake of clarity ##
