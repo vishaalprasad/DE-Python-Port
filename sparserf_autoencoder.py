@@ -29,7 +29,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         super(SparseRFAutoencoder, self).__init__(nhid=nhid, **kwargs)
         self.numCons = numCons
         self.sigma = sigma
-        self.imageSize = imageSize
+        self.imageSize = np.array(imageSize)
 
         self._set_hidden_unit_locations()
         self.mask = self._create_connection_mask()
@@ -41,7 +41,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         return "%s(%s)" % (self.__class__.__name__, props_to_print)
 
     def _set_hidden_unit_locations(self):
-        self.hiddenUnitLocs = np.round(self.imageSize / 2)
+        self.hiddenUnitLocs = np.array([np.round(self.imageSize / 2)])
 
     def _create_connection_mask(self):
         ## Define some useful local variables for sake of clarity ##
@@ -51,7 +51,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         numHiddenUnits = self.hiddenUnitLocs.shape[0]
 
         ## Initialize the Connection Matrix to all zeroes ##
-        connectionMatrix = np.zeros(shape=(numHiddenUnits,numPixels))
+        connectionMatrix = np.zeros(shape=(numPixels, numHiddenUnits))
         currHiddenUnit = 0 # index to keep track of which hidden unit we're working on.
 
         ## Create a variance parameter by squaring each element in sigma, used in Gaussian ##
@@ -77,10 +77,10 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
                 # Calculate which pixel number it is to add to the map.
                 pixelLoc = (y) * imgLength + (x)
 
-                if (connectionMatrix[currHiddenUnit][pixelLoc] == 1):
+                if (connectionMatrix[pixelLoc][currHiddenUnit] == 1):
                     continue
 
-                connectionMatrix[currHiddenUnit][pixelLoc] = 1
+                connectionMatrix[pixelLoc][currHiddenUnit] = 1
                 i += 1
 
             currHiddenUnit += 1
@@ -92,7 +92,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         W = self.weights
         if W in updates:
             updates[W] = updates[W] * self.mask
-
+        return super(SparseRFAutoencoder, self)._modify_updates(updates)
 
 if __name__ == "__main__":
     import dataset
