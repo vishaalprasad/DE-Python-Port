@@ -7,14 +7,12 @@ from pylearn2.models.model import Model
 from pylearn2.linear.matrixmul import MatrixMul
 
 
-
 class SparseRFAutoencoder(DenoisingAutoencoder):
     """
     A denoising autoencoder with sparse local receptive fields.
     """
 
-    def __init__(self, nhid, numCons, sigma, imageSize, corruptor,
-            act_enc, act_dec, nvis, tied_weights=False, irange=1e-3, rng=9001):
+    def __init__(self, nhid, numCons, sigma, imageSize, **kwargs):
         """
         Parameters:
         ----------
@@ -28,22 +26,10 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         imageSize = size of an image
 
         """
-
-
-        super(SparseRFAutoencoder, self).__init__(
-                corruptor,
-                nvis,
-                nhid,
-                act_enc,
-                act_dec,
-                tied_weights,
-                irange,
-                rng
-        )
+        super(SparseRFAutoencoder, self).__init__(nhid=nhid, **kwargs)
         hiddenUnitLocs = self._createHiddenUnits(nhid, imageSize)
         matrix = self._createConnectionMatrix(imageSize, hiddenUnitLocs, numCons, sigma)
         self.mask = matrix.transpose()
-
 
     def _createHiddenUnits(self, numHiddenUnits, imageSize):
         return np.array([[16, 16]])
@@ -92,8 +78,6 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
             currHiddenUnit += 1
 
         return connectionMatrix
-
-
 
     @functools.wraps(Model._modify_updates)
     def _modify_updates(self, updates):
