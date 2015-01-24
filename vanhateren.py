@@ -13,21 +13,27 @@ from theano.compat.six.moves import xrange
 
 class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
 
-    def __init__(self, which_set, axes=('b', 0, 1, 'c')):
+    def __init__(self, which_set, axes=('b', 0, 1, 'c'), img_shape=[32, 32], img_dir=None,
+                 ntrain=200, ntest=50, nvalid=0):
         # note: there is no such thing as the cifar10 validation set;
         # pylearn1 defined one but really it should be user-configurable
         #(as it is here)
         self.axes = axes
+        self.img_shape = img_shape
+        self.img_dir = img_dir or os.getcwd()
+
         #we define here:
         dtype = 'uint16'
-        ntrain = 200
-        nvalid = 0  # artefact, we won't use it
-        ntest = 50
-        self.img_shape = (32, 32)
         self.img_size = np.prod(self.img_shape)
+
         #Get files
-        files = '/home/vprasad/data/vanhateren/*.iml'
-        images = glob.glob(files)
+        nimages = ntrain + ntest + nvalid
+        images = glob.glob(os.path.join(self.img_dir, '*.iml'))
+        if len(images) < nimages:
+            raise Exception("%d images needed for dataset; %d found in %s" % (
+                nimages, 
+                len(images),
+                self.img_dir))
 
         trainX = np.empty(shape=(ntrain, self.img_size))
         testX = np.empty(shape=(ntest, self.img_size))
