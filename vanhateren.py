@@ -1,14 +1,14 @@
-from theano.compat.six.moves import xrange
+import array
+import glob
+import os
 
+import numpy as np
 from pylearn2.datasets import cache, dense_design_matrix
 from pylearn2.expr.preprocessing import global_contrast_normalize
 from pylearn2.utils import contains_nan
 from pylearn2.utils import serial
 from pylearn2.utils import string_utils
-
-import glob
-import numpy as np
-import array
+from theano.compat.six.moves import xrange
 
 
 class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
@@ -59,7 +59,7 @@ class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
         testX = testX / 1.
         testX = testX / max(testMax, trainMax)
         #call super on X
-        
+
         view_converter = dense_design_matrix.DefaultViewConverter((32, 32, 1), axes)
         if which_set == 'train':
             super(VANHATEREN, self).__init__(X=trainX,view_converter = view_converter, axes = axes)
