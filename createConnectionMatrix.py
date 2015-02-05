@@ -1,47 +1,49 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-#==============================================================================#
-#  Function Name: createConnectionMatrix                                       #
-#                                                                              #
-#  Description: Given its parameters, this function populates a connectivity   #
-#  matrix which is a h x p matrix, where h is the number of hidden units and p #
-#  is the number of pixels on the image. It creates ten unique connections for #
-#  each hidden unit using the Gaussian function. Note that if the picture is   #
-#  an m x n pixel map, then pixel[i][k] is represented in the connectivity     #
-#  matrix by "i * imgWidth + k", i.e. view the pixels from left to right and   #
-#  top to bottom.                                                              #
-#                                                                              #
-#  Parameters:  imageSize is a tuple with positive integers.                   #
-#               hiddenUnitLocs is an n x 2 numpy array                         #
-#               numConnections is the number of connections per hidden unit    #
-#               sigma is the standard deviation matrix used in the Gaussian    #
-#                                                                              #
-#  Return Value: This function returns the connectivity matrix, which is an    #
-#  h x p matrix, which has zeroes everywhere except for the locations with a   #
-#  connection between the hidden unit and the pixel, where the value is 1.     #
-#                                                                              #
-#  Example Input:                                                              #
-#  createConnectionMatrix([21, 21], np.array([[1,2], [9,10], [21,21]]),        #
-#                         10, [[2, 0], [0,2]])                                 #
-#==============================================================================#
+# =========================================================================== #
+#  Function Name: createConnectionMatrix                                      #
+#                                                                             #
+#  Description: Given its parameters, this function populates a connectivity  #
+#  matrix which is a h x p matrix, where h is the number of hidden units and p#
+#  is the number of pixels on the image. It creates ten unique connections for#
+#  each hidden unit using the Gaussian function. Note that if the picture is  #
+#  an m x n pixel map, then pixel[i][k] is represented in the connectivity    #
+#  matrix by "i * imgWidth + k", i.e. view the pixels from left to right and  #
+#  top to bottom.                                                             #
+#                                                                             #
+#  Parameters:  imageSize is a tuple with positive integers.                  #
+#               hiddenUnitLocs is an n x 2 numpy array                        #
+#               numConnections is the number of connections per hidden unit   #
+#               sigma is the standard deviation matrix used in the Gaussian   #
+#                                                                             #
+#  Return Value: This function returns the connectivity matrix, which is an   #
+#  h x p matrix, which has zeroes everywhere except for the locations with a  #
+#  connection between the hidden unit and the pixel, where the value is 1.    #
+#                                                                             #
+#  Example Input:                                                             #
+#  createConnectionMatrix([21, 21], np.array([[1,2], [9,10], [21,21]]),       #
+#                         10, [[2, 0], [0,2]])                                #
+# =========================================================================== #
+
 
 def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
 
-    ## Define some useful local variables for sake of clarity ##
+    # Define some useful local variables for sake of clarity
     imgHeight = imageSize[0]
     imgLength = imageSize[1]
     numPixels = imgHeight * imgLength
     numHiddenUnits = len(hiddenUnitLocs)
 
-    ## Initialize the Connection Matrix to all zeroes ##
-    connectionMatrix = np.zeros(shape=(numHiddenUnits,numPixels))
-    currHiddenUnit = 0 # index to keep track of which hidden unit we're working on.
+    # Initialize the Connection Matrix to all zeroes
+    connectionMatrix = np.zeros(shape=(numHiddenUnits, numPixels))
+    currHiddenUnit = 0  # index to keep track of which hidden unit
 
-    ## Create a variance parameter by squaring each element in sigma, used in Gaussian ##
+    # Create a variance parameter by squaring each element in sigma,
+    # used in Gaussian
     variance = [[elem * elem for elem in inner] for inner in sigma]
 
-    ## Loop through the Hidden Units to Create Samples ##
+    # Loop through the Hidden Units to Create Samples
     for k in hiddenUnitLocs:
 
         i = 0
@@ -63,7 +65,6 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
 
             if (connectionMatrix[currHiddenUnit][pixelLoc] == 1):
                 continue
-            #print "Using sample (%2d, %2d) from Gaussian with mean %s, std %s" % (x, y, k, variance)
 
             connectionMatrix[currHiddenUnit][pixelLoc] = 1
             i += 1
@@ -72,44 +73,48 @@ def createConnectionMatrix(imageSize, hiddenUnitLocs, numConnections, sigma):
 
     return connectionMatrix
 
-## Basic function to check equality of floating point numbers ##
-def approx_equal(a, b, epsilon=0.000000001):
-     return abs(a - b) < epsilon
 
-## Basic tester that makes sure that the connectionMatrix has the
-## correct amount of connections for now. Rest of checking was done manually.
+# Basic function to check equality of floating point numbers
+def approx_equal(a, b, epsilon=0.000000001):
+    return abs(a - b) < epsilon
+
+
+# Basic tester that makes sure that the connectionMatrix has the
+# correct amount of connections for now. Rest of checking was done manually.
 def testConnectionMatrix(matrix, numConnection, numHiddenUnit, imageSize):
     connectionCounter = 0
-    for (r,c), value in np.ndenumerate(matrix):
+    for (r, c), value in np.ndenumerate(matrix):
         if approx_equal(value, 1.0):
-            print "Hidden unit # %2d: Connection at %s" % (r, np.unravel_index(c, imageSize),)
+            print "Hidden unit # %2d: Connection at %s" % (
+                  r, np.unravel_index(c, imageSize),)
 
             connectionCounter += 1
     try:
         assert True
         assert numConnection * numHiddenUnit == connectionCounter
     except AssertionError:
-        print "Expected num of connections: %d.\n Received: %d." % (numConnection * numHiddenUnit, connectionCounter)
+        print "Expected num of connections: %d.\n Received: %d." % (
+              numConnection * numHiddenUnit, connectionCounter)
         exit(1)
 
-# Graph a matrix on the Cartesian Plane, with a marking at any location there's a connection or a hidden unit
+
+# Graph a matrix on the Cartesian Plane, with a marking at any location
+# where there's a connection or a hidden unit
 def graphConnectionMatrix(matrix, imageSize, hiddenUnitLocs):
-    plt.figure() #create new window for graph
+    plt.figure()  # create new window for graph
 
     # Plot all of the hidden unit locations
-    for x,y in hiddenUnitLocs:
-        plt.plot(x,y,'ro');
+    for x, y in hiddenUnitLocs:
+        plt.plot(x, y, 'ro')
 
     # Plot all the connection points
-    for (r,c), value in np.ndenumerate(matrix):
+    for (r, c), value in np.ndenumerate(matrix):
         if approx_equal(value, 1.0):
-            [x,y] = np.unravel_index(c, imageSize)
-            plt.plot(x,y,'bx');
-            #print [x, y]
+            [x, y] = np.unravel_index(c, imageSize)
+            plt.plot(x, y, 'bx')
 
-    plt.axis([-1, imageSize[0], -1, imageSize[1]]);
+    plt.axis([-1, imageSize[0], -1, imageSize[1]])
     plt.show()
-
 
 
 def doTest(testName, nConns, imageSize, hiddenUnitLocs, sigma):
@@ -132,8 +137,14 @@ def doRatioTest(testName, nConns, imageSize, hiddenUnitLocs, sigma):
     ratioOfConnections = 0.0
     numTrials = 100
     for i in range(0, numTrials):
+
         mat = createConnectionMatrix(imageSize, hiddenUnitLocs, nConns, sigma)
-        ratioOfConnections += getPropOfHUwithSample(mat, hiddenUnitLocs, imageSize)
+
+        ratioOfConnections += getPropOfHUwithSample(
+            mat,
+            hiddenUnitLocs,
+            imageSize)
+
     ratioOfConnections = ratioOfConnections / numTrials
     print "Ratio is: " + str(ratioOfConnections)
 
@@ -142,53 +153,58 @@ def doRatioTest(testName, nConns, imageSize, hiddenUnitLocs, sigma):
 # units that also have a sample at their locaiton.
 def getPropOfHUwithSample(matrix, hiddenUnitLocs, imageSize):
     numHULocs = len(hiddenUnitLocs)
-    numSampleAtHULoc = 0 #counter
-    for (r,c), value in np.ndenumerate(matrix):
+    numSampleAtHULoc = 0  # counter
+    for (r, c), value in np.ndenumerate(matrix):
         if approx_equal(value, 1.0):
-            [x,y] = np.unravel_index(c, imageSize) #current sample
-            b = hiddenUnitLocs[r] #get the current hidden unit
+            [x, y] = np.unravel_index(c, imageSize)  # current sample
+            b = hiddenUnitLocs[r]  # get the current hidden unit
 
             if (x == b[1] and y == b[0]):
 
                 numSampleAtHULoc += 1
-    return numSampleAtHULoc / float(numHULocs) #get the proportion
+    return numSampleAtHULoc / float(numHULocs)  # get the proportion
 
 
 if __name__ == "__main__":
 
-    myTest = doTest #variable to easily switch between tests
+    myTest = doTest  # variable to easily switch between tests
 
     # Four test cases:
 
     # 1. square image, single unit at center.
-    myTest(testName="single unit at center",
+    myTest(
+        testName="single unit at center",
         nConns=10,
         imageSize=(20, 20),
         hiddenUnitLocs=np.asarray(((10, 10),)),
-        sigma = [[4.5, 0],[0, 4.5]])
-
+        sigma = [[4.5, 0], [0, 4.5]])
 
     # 2. square image, four units symmetrical about the center
-    myTest(testName="four units symmetrical about the center",
+    myTest(
+        testName="four units symmetrical about the center",
         nConns=24,
         imageSize=(80, 80),
-        hiddenUnitLocs = np.array([[14, 39], [39, 14], [39, 64], [64, 39]]),
-        sigma = [[4, 0], [0, 4]])
+        hiddenUnitLocs=np.array([[14, 39], [39, 14], [39, 64], [64, 39]]),
+        sigma=[[4, 0], [0, 4]])
 
     # 3. square image, four units at each corner
-    myTest(testName="four units at each corner",
-        nConns = 15,
-        imageSize = (50, 50),
-        hiddenUnitLocs = np.array([[0, 0], [49, 0], [0, 49], [49, 49]]), #four corners
-        sigma = [[3, 0], [0, 3]])
+    myTest(
+        testName="four units at each corner",
+        nConns=15,
+        imageSize=(50, 50),
+        hiddenUnitLocs=np.array([[0, 0], [49, 0], [0, 49], [49, 49]]),
+        sigma=[[3, 0], [0, 3]])
 
-    # 4. small image, three units, 12 connections, 12 pixels. each pixel maps to each hidden unit
+    # 4. small image, three units, 12 connections, 12 pixels.
+    # Each pixel maps to each hidden unit
 
     # This test is too slow for automatic ratio test.
-    # Comment out condition manually if you specifically want to try the ratio test on this test case.
+    # Comment out condition manually if you specifically want to try
+    # the ratio test on this test case.
     if (myTest != doRatioTest):
-        myTest(testName="3 hidden units, connecting to all pixels",
-            nConns = 12,
-            imageSize = (4, 3),
-            hiddenUnitLocs = np.array([[0,0], [2,2], [3,2]]),
-            sigma = [[1, 0], [0, 1]])
+        myTest(
+            testName="3 hidden units, connecting to all pixels",
+            nConns=12,
+            imageSize=(4, 3),
+            hiddenUnitLocs=np.array([[0, 0], [2, 2], [3, 2]]),
+            sigma=[[1, 0], [0, 1]])
