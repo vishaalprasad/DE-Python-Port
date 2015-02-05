@@ -4,7 +4,6 @@ import numpy as np
 
 from pylearn2.models.autoencoder import DenoisingAutoencoder
 from pylearn2.models.model import Model
-from pylearn2.linear.matrixmul import MatrixMul
 
 
 class SparseRFAutoencoder(DenoisingAutoencoder):
@@ -36,7 +35,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
 
     def __str__(self):
         props_to_print = dict([(prop_name, getattr(self, prop_name))
-                                for prop_name in ['nhid', 'numCons', 'sigma']])
+                               for prop_name in ['nhid', 'numCons', 'sigma']])
 
         return "%s(%s)" % (self.__class__.__name__, props_to_print)
 
@@ -53,16 +52,23 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         imgHeight = self.imageSize[0]
         imgLength = self.imageSize[1]
         numPixels = imgHeight * imgLength
-        numHiddenUnits = self.hiddenUnitLocs.shape[0]
 
         # Determine the scaling
+
         scalefactor = numPixels/self.nhid
-        assert scalefactor >= 1., 'nhid or hidden_units_per_layer is off; %d units requested in %d locations/pixels!' % (self.nhid, numPixels)
-        newgrid = np.array(np.round(self.imageSize / np.sqrt(scalefactor)), dtype=int)
-        assert np.prod(newgrid) == self.nhid, "can't fit; npixels / nhid must be a square (4, 9, 16, etc.)"
+        assert scalefactor >= 1., \
+            'nhid or hidden_units_per_layer is off;' \
+            '%d units requested in %d locations/pixels!' % \
+            (self.nhid, numPixels)
+
+        newgrid = np.array(
+            np.round(self.imageSize / np.sqrt(scalefactor)),
+            dtype=int)
+        assert np.prod(newgrid) == self.nhid, \
+            "can't fit; npixels / nhid must be a square (4, 9, 16, etc.)"
 
         # Set up the hidden unit positions in the smaller grid
-        [X, Y] = np.meshgrid(range(newgrid[1]),range(newgrid[0]))
+        [X, Y] = np.meshgrid(range(newgrid[1]), range(newgrid[0]))
         X = X * np.sqrt(scalefactor)
         Y = Y * np.sqrt(scalefactor)
 
@@ -81,25 +87,27 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         plt.imshow(connection_matrix)
         plt.title('connection matrix')
         plt.show()
-        assert np.count_nonzero(connection_matrix) == self.nhid, '# of requested locations must match the # of provided locations!'
+        assert np.count_nonzero(connection_matrix) == self.nhid, \
+            '# of requested locations must match the # of provided locations!'
 
         return connection_matrix
 
     def _create_connection_mask(self):
-        ## Define some useful local variables for sake of clarity ##
+        # Define some useful local variables for sake of clarity
         imgHeight = self.imageSize[0]
         imgLength = self.imageSize[1]
         numPixels = imgHeight * imgLength
         numHiddenUnits = self.hiddenUnitLocs.shape[0]
 
-        ## Initialize the Connection Matrix to all zeroes ##
+        # Initialize the Connection Matrix to all zeroes
         connectionMatrix = np.zeros(shape=(numPixels, numHiddenUnits))
-        currHiddenUnit = 0 # index to keep track of which hidden unit we're working on.
+        currHiddenUnit = 0  # index to keep track of which hidden unit
 
-        ## Create a variance parameter by squaring each element in sigma, used in Gaussian ##
+        # Create a variance parameter by squaring each element in sigma,
+        # used in Gaussian
         variance = [[elem * elem for elem in inner] for inner in self.sigma]
 
-        ## Loop through the Hidden Units to Create Samples ##
+        # Loop through the Hidden Units to Create Samples
         for k in self.hiddenUnitLocs:
 
             i = 0
