@@ -145,8 +145,8 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         return super(SparseRFAutoencoder, self)._modify_updates(updates)
 
 if __name__ == "__main__":
-    import dataset
-    dataset.create_datasets()
+    from vanhateren import VANHATEREN
+    VANHATEREN.create_datasets()
 
     from pylearn2.scripts.train import train
     train(config="custom.yaml")
