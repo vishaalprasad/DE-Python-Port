@@ -45,10 +45,9 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         hidden units as there are pixels to place.
         Then the code expands the reduced image back out to
         compute the hidden unit locations.
+
+        sets self.hiddenUnitLocs to [nhidden x 2]
         """
-
-        self.hiddenUnitLocs = np.array([np.round(self.imageSize / 2)])
-
         imgHeight = self.imageSize[0]
         imgLength = self.imageSize[1]
         numPixels = imgHeight * imgLength
@@ -83,14 +82,15 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         # Create the outputs from the grids
         connection_matrix = np.zeros(self.imageSize, dtype=bool)
         connection_matrix[Y, X] = True
-        import matplotlib.pyplot as plt
-        plt.imshow(connection_matrix)
-        plt.title('connection matrix')
-        plt.show()
+        if False:  # debug plotting code
+            import matplotlib.pyplot as plt
+            plt.imshow(connection_matrix)
+            plt.title('connection matrix')
+            plt.show()
         assert np.count_nonzero(connection_matrix) == self.nhid, \
             '# of requested locations must match the # of provided locations!'
 
-        return connection_matrix
+        self.hiddenUnitLocs = np.asarray(np.nonzero(connection_matrix)).T
 
     def _create_connection_mask(self):
         # Define some useful local variables for sake of clarity
