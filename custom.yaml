@@ -3,22 +3,24 @@
         "model": !obj:sparserf_autoencoder.SparseRFAutoencoder {
             "nhid" : 1024,
             "nvis" : 1024,
-            "irange" : 0.05,
+            "irange" : 0.25,
             "corruptor": !obj:pylearn2.corruption.BinomialCorruptor {
-                "corruption_level": 0.5,
+                "corruption_level": 0.001,
             },
             "act_enc": "tanh",
             "act_dec": null,    # Linear activation on the decoder side.
 
-            "numCons" : 10,
+            "numCons" : 25,
             "sigma" : [[2, 0], [0, 2]],
             "imageSize" : [32, 32],
 
         },
         algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
-            "learning_rule": !obj:pylearn2.training_algorithms.learning_rule.Momentum { "init_momentum": 0.9 },
-            "batch_size": 100,
-            "learning_rate": .01,
+            "learning_rule": !obj:pylearn2.training_algorithms.learning_rule.Momentum {
+                "init_momentum": 0.9
+            },
+            "batch_size": 25,
+            "learning_rate": .025,
             "monitoring_dataset":
                 {
                     'valid' : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/valid.pkl",
@@ -26,7 +28,7 @@
                 },
             "cost" : !obj:pylearn2.costs.autoencoder.MeanSquaredReconstructionError {},
             "termination_criterion": !obj:pylearn2.termination_criteria.EpochCounter {
-                "max_epochs": 50,
+                "max_epochs": 100,
             },
         },
         "save_path": "./savedata.pkl",
