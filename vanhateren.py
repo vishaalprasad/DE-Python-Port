@@ -9,6 +9,32 @@ from pylearn2.utils import serial, string_utils
 
 DATA_DIR = string_utils.preprocess('${PYLEARN2_DATA_PATH}/vanhateren')
 ALL_DATASETS = ['train', 'test', 'valid']
+VH_WIDTH = 1536
+VH_HEIGHT = 1024
+
+
+def read_iml(filename, width=VH_WIDTH, height=VH_HEIGHT, dtype='uint16'):
+    """Reads an IML file and returns as an ndarray."""
+
+    with open(filename, 'rb') as handle:
+        s = handle.read()
+    arr = array.array('H', s)
+    arr.byteswap()
+
+    if width and height:
+        arr = np.array(arr, dtype=dtype).reshape(height, width)
+
+    return arr
+
+
+def get_patch(img, patch_size=(32, 32), width_slice=None, height_slice=None):
+    width = img.shape[1]
+    height = img.shape[0]
+    left_margin = (width-patch_size[1])/2
+    top_margin = (height-patch_size[0])/2
+    img_patch = img[top_margin: top_margin+patch_size[0],
+                    left_margin:left_margin+patch_size[1]].flatten()
+    return img_patch.reshape(patch_size)
 
 
 class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
@@ -26,7 +52,6 @@ class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
         self.img_dir = img_dir or DATA_DIR
 
         # We define here:
-        dtype = 'uint16'
         self.img_size = np.prod(self.img_shape)
 
         # Get files
@@ -43,21 +68,11 @@ class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
         validX = np.empty(shape=(nvalid, self.img_size))
 
         # Take 250 images, convert to 32x32, store in X
-        for ii, image in enumerate(images[:(ntrain + ntest + nvalid)]):
-            with open(image, 'rb') as handle:
-                s = handle.read()
-            arr = array.array('H', s)
-            arr.byteswap()
-
-            width = 1536
-            height = 1024
-
-            img = np.array(arr, dtype=dtype).reshape(height, width)
-            left_margin = (width-32)/2
-            top_margin = (height-32)/2
-
-            img_patch = img[top_margin: top_margin+32,
-                            left_margin:left_margin+32].flatten()
+        width = VH_WIDTH
+        height = VH_HEIGHT
+        for ii, image_file in enumerate(images[:(ntrain + ntest + nvalid)]):
+            img = read_iml(image_file, width=width, height=height)
+            img_patch = get_patch(img, patch_size=(32, 32))
             if ii < ntrain:
                 trainX[ii] = img_patch
             elif ii < (ntrain + ntest):

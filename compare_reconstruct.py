@@ -1,28 +1,40 @@
-from pylearn2.utils import serial
-from pylearn2.models.model import Model
-import numpy, array
+import array
+import glob
+import numpy
+import os
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-filename = "/raid/vprasad/data/lisa/data/vanhateren/imk03739.iml" #arbitrary
+from pylearn2.utils import serial
 
-with open(filename, 'rb') as handle:
-        s = handle.read()
-arr = array.array('H', s)
-arr.byteswap()
-img = numpy.array(arr, dtype='uint16').reshape(1024, 1536)
-width = 1536
-height = 1024
-left_margin = (width-32)/2
-top_margin = (height-32)/2
-crop_img = img[top_margin: top_margin+32, left_margin:left_margin+32]
-plt.imshow(crop_img, cmap = cm.Greys_r)
-plt.savefig('original.png')
+from vanhateren import DATA_DIR, VH_WIDTH, VH_HEIGHT
+from vanhateren import read_iml, get_patch
+
+
+width = VH_WIDTH
+height = VH_HEIGHT
+patch_size = (32, 32)
+
+# Grab an image patch
+all_files = glob.glob(os.path.join(DATA_DIR, '*.iml'))
+file_path = all_files[0]
+img = read_iml(file_path, width=width, height=height)
+img_patch = get_patch(img, patch_size=patch_size)
+
+# Show the patch
+fh = plt.figure()
+fh.add_subplot(1, 2, 1)
+plt.imshow(img_patch, cmap=cm.Greys_r)
+
+# Run the model and visualize
 model = serial.load('savedata.pkl')
-[tensor_var] = model.reconstruct([crop_img.flatten()])
-plt.imshow(tensor_var.eval().reshape((32,32)), cmap=cm.Greys_r)
-plt.savefig('reconstruct.png')
-import os
-os.system('eog original.png &')
-os.system('eog reconstruct.png &')
+[tensor_var] = model.reconstruct([img_patch.flatten()])
 
+# Show the reconstructed patch
+fh.add_subplot(1, 2, 2)
+plt.imshow(tensor_var.eval().reshape(patch_size), cmap=cm.Greys_r)
+
+# Display both to screen
+#plt.savefig('model_performance.png')
+#os.system('eog model_performance.png &')
+plt.show()
