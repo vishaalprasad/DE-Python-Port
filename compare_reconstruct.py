@@ -1,38 +1,27 @@
-import array
-import glob
-import numpy as np
 import os
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-from pylearn2.utils import serial, string_utils
+from pylearn2.utils import serial
 
-from vanhateren import DATA_DIR, VH_WIDTH, VH_HEIGHT
-from vanhateren import read_iml, get_patch
+from vanhateren import DATA_DIR, VANHATEREN
 
 
-def compare_reconstruction(model_path='savedata.pkl', img_file_path=None, img_idx=None, plt_out=None):
-    width = VH_WIDTH
-    height = VH_HEIGHT
+def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
+                           img_idx=None, plt_out=None):
     patch_size = (32, 32)
 
-    # Grab an image patch
-    if img_idx is not None:
-        print("Grabbing an image patch from the training set...")
-        train_img = os.path.join(DATA_DIR, 'train.pkl')
-        train_set = serial.load(train_img)
-        img_vector = train_set.X[img_idx, :]
-        img_patch = img_vector.reshape(patch_size)
+    print("Loading the training set...")
+    train_img = os.path.join(DATA_DIR, 'train.pkl')
+    train_set = serial.load(train_img)
 
-    else:
-        # If no path specified, grab the second one found.
-        if img_file_path is None:
-            all_files = glob.glob(os.path.join(DATA_DIR, '*.iml'))
-            img_file_path = all_files[1]
-        print("Grabbing an image patch from %s..." % img_file_path)
-        img = read_iml(img_file_path, width=width, height=height)
-        img_patch = get_patch(img, patch_size=patch_size)
-        img_vector = img_patch.ravel()
+    # Grab an image patch
+    if img_idx is None:
+        img_idx = 2
+
+    print("Grabbing an image patch from the training set...")
+    img_vector = train_set.denormalize_image(train_set.X[img_idx, :])
+    img_patch = img_vector.reshape(patch_size)
 
     # Show the patch
     fh = plt.figure()
