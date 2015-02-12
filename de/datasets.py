@@ -7,13 +7,7 @@ from pylearn2.datasets import dense_design_matrix
 from pylearn2.utils import serial, string_utils
 
 
-DATA_DIR = string_utils.preprocess('${PYLEARN2_DATA_PATH}/vanhateren')
-ALL_DATASETS = ['train', 'test', 'valid']
-VH_WIDTH = 1536
-VH_HEIGHT = 1024
-
-
-def read_iml(filename, width=VH_WIDTH, height=VH_HEIGHT, dtype='uint16'):
+def read_iml(filename, width, height, dtype='uint16'):
     """Reads an IML file and returns as an ndarray."""
 
     with open(filename, 'rb') as handle:
@@ -37,13 +31,18 @@ def get_patch(img, patch_size=(32, 32), width_slice=None, height_slice=None):
     return img_patch.reshape(patch_size)
 
 
-class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
+class VanHateren(dense_design_matrix.DenseDesignMatrix):
+
+    DATA_DIR = string_utils.preprocess('${PYLEARN2_DATA_PATH}/vanhateren')
+    ALL_DATASETS = ['train', 'test', 'valid']
+    VH_WIDTH = 1536
+    VH_HEIGHT = 1024
 
     def __init__(self, which_set, axes=('b', 0, 1, 'c'),
                  patch_size=(32, 32), img_dir=None, ntrain=200,
                  ntest=25, nvalid=25):
 
-        assert which_set in ALL_DATASETS, \
+        assert which_set in self.ALL_DATASETS, \
             "Set specified is not a valid set. Please use 'train' or " \
             "'test' or 'valid'"
 
@@ -51,7 +50,7 @@ class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
         self.axes = axes
         self.img_shape = patch_size
         self.img_size = np.prod(patch_size)
-        self.img_dir = img_dir or DATA_DIR
+        self.img_dir = img_dir or self.DATA_DIR
 
         # Get files
         nimages = ntrain + ntest + nvalid
@@ -74,8 +73,8 @@ class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
         X = np.empty((len(img_indices), self.img_size))
 
         # Take 250 images, convert to 32x32, store in X
-        width = VH_WIDTH
-        height = VH_HEIGHT
+        width = self.VH_WIDTH
+        height = self.VH_HEIGHT
         for ii, img_idx in enumerate(img_indices):
             if ii > 0 and ii % 10 == 0:
                 print '%d of %d' % (ii + 1, len(img_indices))
@@ -94,7 +93,7 @@ class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
             patch_size + (1,),
             axes)
 
-        super(VANHATEREN, self).__init__(
+        super(VanHateren, self).__init__(
             X=X,
             view_converter=view_converter,
             axes=axes)
@@ -132,4 +131,4 @@ class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
 
 
 if __name__ == "__main__":
-    VANHATEREN.create_datasets(overwrite=True)
+    VanHateren.create_datasets(overwrite=True)

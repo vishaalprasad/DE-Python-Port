@@ -2,8 +2,8 @@
 if __name__ == "__main__":
 
     # Create the dataset
-    from de.vanhateren import VANHATEREN
-    VANHATEREN.create_datasets()
+    from de.datasets import VanHateren
+    VanHateren.create_datasets()
 
     # Train the network.
     from pylearn2.scripts.train import train
