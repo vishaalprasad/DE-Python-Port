@@ -7,7 +7,7 @@ from pylearn2.utils import serial
 from .datasets import VanHateren
 
 
-def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
+def compare_reconstruction(model_path='sparserf.pkl', img_file_path=None,
                            img_idx=None, plt_out=None):
     patch_size = (32, 32)
 
@@ -56,4 +56,4 @@ def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
 
 if __name__ == '__main__':
     import sys
-    compare_reconstruction(model_path='savedata.pkl')
+    compare_reconstruction(model_path='sparserf.pkl')
