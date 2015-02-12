@@ -36,7 +36,11 @@ def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
     # Show the reconstructed patch
     print("Plotting...")
     fh.add_subplot(1, 2, 2)
-    plt.imshow(tensor_var.eval().reshape(patch_size), cmap=cm.Greys_r)
+
+    reconstructed_vector = tensor_var.eval()
+    reconstructed_patch = train_set.denormalize_image(reconstructed_vector)
+    reconstructed_patch = reconstructed_patch.reshape(patch_size)
+    plt.imshow(reconstructed_patch, cmap=cm.Greys_r)
 
     # Display both to screen
     if plt_out is None:
