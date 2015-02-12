@@ -27,6 +27,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         """
         nvis = np.prod(imageSize)
         assert nhid % hpl == 0, "nhid must be evenly divisible by hpl"
+        kwargs['tied_weights'] = False
         super(SparseRFAutoencoder, self).__init__(nhid=nhid, **kwargs)
         self.numCons = numCons
         self.sigma = sigma
