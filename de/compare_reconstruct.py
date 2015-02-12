@@ -12,8 +12,8 @@ def compare_reconstruction(model_path='sparserf.pkl', img_file_path=None,
     patch_size = (32, 32)
 
     print("Loading the training set...")
-    train_img = os.path.join(VanHateren.DATA_DIR, 'train.pkl')
-    train_set = serial.load(train_img)
+    train_path = os.path.join(VanHateren.DATA_DIR, 'train.pkl')
+    train_set = serial.load(train_path)
 
     # Grab an image patch
     if img_idx is None:
