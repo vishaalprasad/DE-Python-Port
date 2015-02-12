@@ -156,7 +156,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
 if __name__ == "__main__":
 
     # Create the dataset
-    from vanhateren import VANHATEREN
+    from .vanhateren import VANHATEREN
     VANHATEREN.create_datasets()
 
     # Train the network.
@@ -168,5 +168,5 @@ if __name__ == "__main__":
     show_weights(model_path="savedata.pkl", border=True)
 
     # Visualize the reconstruction
-    from compare_reconstruct import compare_reconstruction
+    from .compare_reconstruct import compare_reconstruction
     compare_reconstruction(model_path="savedata.pkl")

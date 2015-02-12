@@ -4,7 +4,7 @@ import matplotlib.cm as cm
 
 from pylearn2.utils import serial
 
-from vanhateren import DATA_DIR, VANHATEREN
+from .vanhateren import DATA_DIR, VANHATEREN
 
 
 def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
