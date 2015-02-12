@@ -27,6 +27,8 @@ def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
     fh = plt.figure()
     fh.add_subplot(1, 2, 1)
     plt.imshow(img_patch, cmap=cm.Greys_r)
+    plt.axis('off')
+    plt.title('Original image')
 
     # Run the model and visualize
     print("Running the model...")
@@ -41,6 +43,8 @@ def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
     reconstructed_patch = train_set.denormalize_image(reconstructed_vector)
     reconstructed_patch = reconstructed_patch.reshape(patch_size)
     plt.imshow(reconstructed_patch, cmap=cm.Greys_r)
+    plt.axis('off')
+    plt.title('Reconstructed image')
 
     # Display both to screen
     if plt_out is None:
@@ -51,4 +55,5 @@ def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
 
 
 if __name__ == '__main__':
+    import sys
     compare_reconstruction(model_path='savedata.pkl')
