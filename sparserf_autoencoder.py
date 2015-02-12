@@ -30,7 +30,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         self.sigma = sigma
         self.imageSize = np.array(imageSize)
 
-        self._set_hidden_unit_locations()
+        self.hiddenUnitLocs = self._set_hidden_unit_locations()
         self.mask = self._create_connection_mask()
 
     def __str__(self):
@@ -90,7 +90,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         assert np.count_nonzero(connection_matrix) == self.nhid, \
             '# of requested locations must match the # of provided locations!'
 
-        self.hiddenUnitLocs = np.asarray(np.nonzero(connection_matrix)).T
+        return np.asarray(np.nonzero(connection_matrix)).T
 
     def _create_connection_mask(self):
         # Define some useful local variables for sake of clarity
