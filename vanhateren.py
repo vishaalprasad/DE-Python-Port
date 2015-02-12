@@ -33,7 +33,7 @@ def get_patch(img, patch_size=(32, 32), width_slice=None, height_slice=None):
     left_margin = (width-patch_size[1])/2
     top_margin = (height-patch_size[0])/2
     img_patch = img[top_margin: top_margin+patch_size[0],
-                    left_margin:left_margin+patch_size[1]].flatten()
+                    left_margin:left_margin+patch_size[1]].flatten(1)
     return img_patch.reshape(patch_size)
 
 
@@ -82,7 +82,7 @@ class VANHATEREN(dense_design_matrix.DenseDesignMatrix):
             image_file = images[img_idx]
             img = read_iml(image_file, width=width, height=height)
             img_patch = get_patch(img, patch_size=patch_size)
-            X[ii, :] = img_patch.flatten()
+            X[ii, :] = img_patch.flatten(1)
 
         # Post-processing
         self.subtracted_mean = X.mean(axis=0)

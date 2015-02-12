@@ -76,8 +76,8 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         Y = Y + (np.sqrt(scalefactor)) / 2 - 0.5
 
         # Turn into rounded column vectors
-        X = np.ravel(np.round(X)).astype(int)
-        Y = np.ravel(np.round(Y)).astype(int)
+        X = np.round(X).astype(int).flatten(1)
+        Y = np.round(Y).astype(int).flatten(1)
 
         # Create the outputs from the grids
         connection_matrix = np.zeros(self.imageSize, dtype=bool)
