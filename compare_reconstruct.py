@@ -17,7 +17,7 @@ def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
 
     # Grab an image patch
     if img_idx is None:
-        img_idx = 2
+        img_idx = 4
 
     print("Grabbing an image patch from the training set...")
     img_vector = train_set.denormalize_image(train_set.X[img_idx, :])
