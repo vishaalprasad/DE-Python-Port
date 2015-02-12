@@ -4,15 +4,15 @@
             "nhid" : 1024,
             "hpl": 1,
             "nvis" : 1024,
-            "irange" : 0.25,
+            "irange" : 0.025,
             "corruptor": !obj:pylearn2.corruption.BinomialCorruptor {
-                "corruption_level": 0.001,
+                "corruption_level": 0.0001,
             },
-            "act_enc": "tanh",
+            "act_enc": null,
             "act_dec": null,    # Linear activation on the decoder side.
 
-            "numCons" : 25,
-            "sigma" : [[2, 0], [0, 2]],
+            "numCons" : 12,
+            "sigma" : [[3, 0], [0, 3]],
             "imageSize" : [32, 32],
 
         },
@@ -21,18 +21,18 @@
                 "init_momentum": 0.9
             },
             "batch_size": 25,
-            "learning_rate": .025,
+            "learning_rate": 5E-3,
             "monitoring_dataset":
                 {
-                    'valid' : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/valid.pkl",
                     'test'  : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/test.pkl",
+                    'valid' : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/valid.pkl",
                 },
             "cost" : !obj:pylearn2.costs.autoencoder.MeanSquaredReconstructionError {},
             "termination_criterion": !obj:pylearn2.termination_criteria.EpochCounter {
-                "max_epochs": 100,
+                "max_epochs": 200,
             },
         },
         "save_path": "./savedata.pkl",
-        "save_freq": 100
+        "save_freq": 200
     }
 
