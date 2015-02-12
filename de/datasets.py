@@ -31,14 +31,25 @@ def get_patch(img, patch_size=(32, 32), width_slice=None, height_slice=None):
     return img_patch.reshape(patch_size)
 
 
-class VanHateren(dense_design_matrix.DenseDesignMatrix):
-
-    DATA_DIR = string_utils.preprocess('${PYLEARN2_DATA_PATH}/vanhateren')
+class ImageDataset(dense_design_matrix.DenseDesignMatrix):
+    """
+    """
     ALL_DATASETS = ['train', 'test', 'valid']
-    VH_WIDTH = 1536
-    VH_HEIGHT = 1024
+    ALL_LOADERS = {
+        '.iml': read_iml, }
 
-    def __init__(self, which_set, axes=('b', 0, 1, 'c'),
+    @classmethod
+    def get_image_files(cls, img_dir, filter_fn=lambda *arg: True):
+        images = []
+        image_loaders = []
+        for image_filepath in glob.glob(os.path.join(img_dir, '*.*')):
+            _, ext = os.path.splitext(image_filepath)
+            if ext in list(cls.ALL_LOADERS.keys()) and filter_fn(image_filepath):
+                images.append(image_filepath)
+                image_loaders.append(cls.ALL_LOADERS[ext])
+        return images, image_loaders
+
+    def __init__(self, which_set, width, height, axes=('b', 0, 1, 'c'),
                  patch_size=(32, 32), img_dir=None, ntrain=200,
                  ntest=25, nvalid=25):
 
@@ -50,11 +61,11 @@ class VanHateren(dense_design_matrix.DenseDesignMatrix):
         self.axes = axes
         self.img_shape = patch_size
         self.img_size = np.prod(patch_size)
-        self.img_dir = img_dir or self.DATA_DIR
+        self.img_dir = img_dir
 
         # Get files
         nimages = ntrain + ntest + nvalid
-        images = glob.glob(os.path.join(self.img_dir, '*.iml'))
+        images, image_loaders = self.__class__.get_image_files(self.img_dir)
         if len(images) < nimages:
             # Note: could download using requests via
             # http://cin-11.medizin.uni-tuebingen.de:61280/vanhateren/iml/
@@ -73,13 +84,11 @@ class VanHateren(dense_design_matrix.DenseDesignMatrix):
         X = np.empty((len(img_indices), self.img_size))
 
         # Take 250 images, convert to 32x32, store in X
-        width = self.VH_WIDTH
-        height = self.VH_HEIGHT
         for ii, img_idx in enumerate(img_indices):
             if ii > 0 and ii % 10 == 0:
                 print '%d of %d' % (ii + 1, len(img_indices))
             image_file = images[img_idx]
-            img = read_iml(image_file, width=width, height=height)
+            img = image_loaders[img_idx](image_file, width=width, height=height)
             img_patch = get_patch(img, patch_size=patch_size)
             X[ii, :] = img_patch.flatten(1)
 
@@ -104,11 +113,26 @@ class VanHateren(dense_design_matrix.DenseDesignMatrix):
     def denormalize_image(self, image_data):
         return (image_data * self.max_val) + self.subtracted_mean
 
+
+
+class VanHateren(ImageDataset):
+
+    DATA_DIR = string_utils.preprocess('${PYLEARN2_DATA_PATH}/vanhateren')
+    VH_WIDTH = 1536
+    VH_HEIGHT = 1024
+
+    def __init__(self, **kwargs):
+        super(VanHateren, self).__init__(
+            width=self.VH_WIDTH,
+            height=self.VH_HEIGHT,
+            **kwargs)
+
     @classmethod
-    def create_datasets(cls, datasets=ALL_DATASETS, overwrite=False,
+    def create_datasets(cls, datasets=None, overwrite=False,
                         img_dir=DATA_DIR, output_dir=DATA_DIR):
         """Creates the requested datasets, and writes them to disk.
         """
+        datasets = datasets or cls.ALL_DATASETS
         serial.mkdir(output_dir)
 
         for dataset_name in list(datasets):
@@ -130,7 +154,7 @@ class VanHateren(dense_design_matrix.DenseDesignMatrix):
                 serial.save(output_files['pkl'], dataset)
 
 
-class DEDataset(dense_design_matrix.DenseDesignMatrix):
+##class DEDataset(dense_design_matrix.DenseDesignMatrix):
     """
     X: encoded values of some image set.
     Y: classification values.
@@ -138,12 +162,15 @@ class DEDataset(dense_design_matrix.DenseDesignMatrix):
     Contains a SparseRFAutoencoder object, which it trains on
     the VanHateren dataset.
     """
-
-    def __init__(self, encoder, image_dataset, **kwargs):
+"""
+    def __init__(self, which_set, encoder, image_dataset
+                 axes=('b', 0, 1, 'c'),
+                 patch_size=(32, 32), img_dir=None, ntrain=200,
+                 ntest=25, nvalid=25):
         self.encoder = encoder
         X = encoder.encode(image_dataset)
         Y = np.ones((X.shape[0],))
         super(VanHateren, self).__init__(X=X, Y=Y, **kwargs)
-
+"""
 if __name__ == "__main__":
     VanHateren.create_datasets(overwrite=True)
