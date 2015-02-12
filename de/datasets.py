@@ -130,5 +130,20 @@ class VanHateren(dense_design_matrix.DenseDesignMatrix):
                 serial.save(output_files['pkl'], dataset)
 
 
+class DEDataset(dense_design_matrix.DenseDesignMatrix):
+    """
+    X: encoded values of some image set.
+    Y: classification values.
+
+    Contains a SparseRFAutoencoder object, which it trains on
+    the VanHateren dataset.
+    """
+
+    def __init__(self, encoder, image_dataset, **kwargs):
+        self.encoder = encoder
+        X = encoder.encode(image_dataset)
+        Y = np.ones((X.shape[0],))
+        super(VanHateren, self).__init__(X=X, Y=Y, **kwargs)
+
 if __name__ == "__main__":
     VanHateren.create_datasets(overwrite=True)
