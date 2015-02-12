@@ -2,6 +2,7 @@
         "dataset": !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/train.pkl",
         "model": !obj:sparserf_autoencoder.SparseRFAutoencoder {
             "nhid" : 1024,
+            "hpl": 1,
             "nvis" : 1024,
             "irange" : 0.25,
             "corruptor": !obj:pylearn2.corruption.BinomialCorruptor {

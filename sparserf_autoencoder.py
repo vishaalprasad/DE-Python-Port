@@ -11,7 +11,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
     A denoising autoencoder with sparse local receptive fields.
     """
 
-    def __init__(self, nhid, numCons, sigma, imageSize, **kwargs):
+    def __init__(self, nhid, numCons, sigma, imageSize, hpl=1, **kwargs):
         """
         Parameters:
         ----------
@@ -25,13 +25,20 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         imageSize = size of an image
 
         """
+        nvis = np.prod(imageSize)
+        assert nhid % hpl == 0, "nhid must be evenly divisible by hpl"
         super(SparseRFAutoencoder, self).__init__(nhid=nhid, **kwargs)
         self.numCons = numCons
         self.sigma = sigma
+        self.hpl = hpl
         self.imageSize = np.array(imageSize)
 
         self.hiddenUnitLocs = self._set_hidden_unit_locations()
-        self.mask = self._create_connection_mask()
+        self.mask = np.empty((nvis, nhid))  # ninput x nhidden
+        for ii in range(hpl):
+            cur_idx = np.arange(nhid // hpl) + ii * (nhid // hpl)
+            self.mask[:, cur_idx] = self._create_connection_mask()
+        self.weights.set_value((self.weights * self.mask).eval())
 
     def __str__(self):
         props_to_print = dict([(prop_name, getattr(self, prop_name))
@@ -51,19 +58,20 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
         imgHeight = self.imageSize[0]
         imgLength = self.imageSize[1]
         numPixels = imgHeight * imgLength
+        nhid = self.nhid / self.hpl
 
         # Determine the scaling
 
-        scalefactor = numPixels/self.nhid
+        scalefactor = numPixels/nhid
         assert scalefactor >= 1., \
             'nhid or hidden_units_per_layer is off;' \
             '%d units requested in %d locations/pixels!' % \
-            (self.nhid, numPixels)
+            (nhid, numPixels)
 
         newgrid = np.array(
             np.round(self.imageSize / np.sqrt(scalefactor)),
             dtype=int)
-        assert np.prod(newgrid) == self.nhid, \
+        assert np.prod(newgrid) == nhid, \
             "can't fit; npixels / nhid must be a square (4, 9, 16, etc.)"
 
         # Set up the hidden unit positions in the smaller grid
@@ -87,7 +95,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
             plt.imshow(connection_matrix)
             plt.title('connection matrix')
             plt.show()
-        assert np.count_nonzero(connection_matrix) == self.nhid, \
+        assert np.count_nonzero(connection_matrix) == nhid, \
             '# of requested locations must match the # of provided locations!'
 
         return np.asarray(np.nonzero(connection_matrix)).T
