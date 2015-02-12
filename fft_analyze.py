@@ -6,10 +6,12 @@ import glob
 import os
 import radialProfile
 
-from vanhateren import DATA_DIR, VH_WIDTH, VH_HEIGHT
+from pylearn2.utils import serial
+
+from vanhateren import DATA_DIR, VH_WIDTH, VH_HEIGHT, VANHATEREN
 from vanhateren import read_iml, get_patch
 
-def fft2 (image):
+def fft2(image):
     freq = fftpack.fft2(image)
     shifted = fftpack.fftshift(freq)
     return np.abs(shifted)
@@ -24,10 +26,16 @@ def fft2AverageOnImageSet (images):
 
 
 if __name__ == '__main__':
-    all_files = glob.glob(os.path.join(DATA_DIR, '*.iml'))
+    print("Loading the training set...")
+    train_img = os.path.join(DATA_DIR, 'train.pkl')
+    train_set = serial.load(train_img)
+    patch_size = (32, 32)
+
     list_of_images = []
-    for a_file in all_files:
-        list_of_images.append(read_iml(a_file))
+    for ii in np.arange(train_set.X.shape[0]):
+        img_vector = train_set.denormalize_image(train_set.X[ii, :])
+        img_patch = img_vector.reshape(patch_size)
+        list_of_images.append(img_patch)
     average_frequency = fft2AverageOnImageSet(list_of_images)
 
     plt.imshow(np.log(average_frequency))

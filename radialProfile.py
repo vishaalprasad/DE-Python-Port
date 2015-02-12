@@ -17,7 +17,6 @@ def azimuthalAverage(image, center=None):
         center = np.array([(x.max()-x.min())/2.0, (y.max()-y.min())/2.0])
 
     r = np.hypot(x - center[0], y - center[1])
-    import pdb; pdb.set_trace()
     # Get sorted radii
     ind = np.argsort(r.flat)
     r_sorted = r.flat[ind]
@@ -37,4 +36,5 @@ def azimuthalAverage(image, center=None):
 
     radial_prof = tbin / nr
 
+    import pdb; pdb.set_trace()
     return radial_prof
