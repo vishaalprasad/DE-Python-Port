@@ -32,7 +32,7 @@
                 "max_epochs": 20,
             },
         },
-        "save_path": "./savedata.pkl",
+        "save_path": "./sparserf.pkl",
         "save_freq": 20
     }
 
