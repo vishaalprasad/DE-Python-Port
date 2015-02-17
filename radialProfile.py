@@ -1,3 +1,6 @@
+# Taken from:
+# http://www.astrobetter.com/wiki/tiki-index.php?page=python_image_fft
+
 import numpy as np
 
 def azimuthalAverage(image, center=None):
