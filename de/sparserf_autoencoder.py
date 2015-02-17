@@ -156,17 +156,17 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
 if __name__ == "__main__":
 
     # Create the dataset
-    from vanhateren import VANHATEREN
-    VANHATEREN.create_datasets()
+    from .datasets import VanHateren
+    VanHateren.create_datasets()
 
     # Train the network.
     from pylearn2.scripts.train import train
-    train(config="custom.yaml")
+    train(config="sparserf.yaml")
 
     # Visualize the weights
     from pylearn2.scripts.show_weights import show_weights
-    show_weights(model_path="savedata.pkl", border=True)
+    show_weights(model_path="sparserf.pkl", border=True)
 
     # Visualize the reconstruction
-    from compare_reconstruct import compare_reconstruction
-    compare_reconstruction(model_path="savedata.pkl")
+    from .compare_reconstruct import compare_reconstruction
+    compare_reconstruction(model_path="sparserf.pkl")

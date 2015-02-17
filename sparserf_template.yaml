@@ -1,18 +1,18 @@
  !obj:pylearn2.train.Train {
         "dataset": !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/train.pkl",
-        "model": !obj:sparserf_autoencoder.SparseRFAutoencoder {
+        "model": !obj:de.sparserf_autoencoder.SparseRFAutoencoder {
             "nhid" : 1024,
             "hpl": 1,
             "nvis" : 1024,
             "irange" : 0.025,
             "corruptor": !obj:pylearn2.corruption.BinomialCorruptor {
-                "corruption_level": 0.0001,
+                "corruption_level": 0.01,
             },
             "act_enc": null,
             "act_dec": null,    # Linear activation on the decoder side.
 
-            "numCons" : 12,
-            "sigma" : [[3, 0], [0, 3]],
+            "numCons" : %s,
+            "sigma" : %s,
             "imageSize" : [32, 32],
 
         },
@@ -29,10 +29,10 @@
                 },
             "cost" : !obj:pylearn2.costs.autoencoder.MeanSquaredReconstructionError {},
             "termination_criterion": !obj:pylearn2.termination_criteria.EpochCounter {
-                "max_epochs": 200,
+                "max_epochs": 100,
             },
         },
-        "save_path": "./savedata.pkl",
-        "save_freq": 200
+        "save_path": %s,
+        "save_freq": 100
     }
 
