@@ -36,5 +36,4 @@ def azimuthalAverage(image, center=None):
 
     radial_prof = tbin / nr
 
-    import pdb; pdb.set_trace()
     return radial_prof
