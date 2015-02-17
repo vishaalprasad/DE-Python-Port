@@ -6,7 +6,7 @@ import radialProfile
 
 from pylearn2.utils import serial
 
-from vanhateren import DATA_DIR, VANHATEREN
+from de.datasets import VanHateren
 
 
 def fft2(image):
@@ -28,7 +28,7 @@ def fft2AverageOnImageSet(images):
 def singleImageAnalysis(model_path):
 
     print("Loading the training set...")
-    train_img = os.path.join(DATA_DIR, 'train.pkl')
+    train_img = os.path.join(VanHateren.DATA_DIR, 'train.pkl')
     train_set = serial.load(train_img)
     patch_size = (32, 32)
 
@@ -91,7 +91,7 @@ def singleImageAnalysis(model_path):
 # hemispherical representation of a set of images.
 def hemisphericalDifferences(left_model_path, right_model_path):
     print("Loading the training set...")
-    train_img = os.path.join(DATA_DIR, 'train.pkl')
+    train_img = os.path.join(VanHateren.DATA_DIR, 'train.pkl')
     train_set = serial.load(train_img)
     patch_size = (32, 32)
 
