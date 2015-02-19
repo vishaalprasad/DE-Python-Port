@@ -1,0 +1,54 @@
+!obj:pylearn2.train.Train {
+        "dataset": !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/train.pkl",
+        "model": !obj:pylearn2.models.mlp.MLP {
+           "batch_size": %(batch_size)i,
+            "layers": [
+                 !obj:pylearn2.models.mlp.PretrainedLayer {
+                     "layer_name": 'h1',
+                     "layer_content": !pkl: "savedata.pkl",
+                 },
+                 !obj:pylearn2.models.mlp.Softmax {
+                     "max_col_norm": 1.9365,
+                     "layer_name": 'y',
+                     "n_classes": 10,
+                     "irange": .005
+                 }
+                ],
+            "nvis": 1024
+        },
+        "algorithm": !obj:pylearn2.training_algorithms.sgd.SGD {
+            "learning_rate": .05,
+            "learning_rule": !obj:pylearn2.training_algorithms.learning_rule.Momentum {
+                "init_momentum": .5,
+            },
+            "monitoring_dataset":
+                {
+                    'test'  : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/test.pkl",
+                    'valid' : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/valid.pkl",
+                },        
+            "cost": !obj:pylearn2.costs.mlp.Default {},
+            "termination_criterion": !obj:pylearn2.termination_criteria.And {
+                "criteria": [
+                    !obj:pylearn2.termination_criteria.MonitorBased {
+                        "channel_name": "valid_y_misclass",
+                        "prop_decrease": 0.,
+                        "N": 100
+                    },
+                    !obj:pylearn2.termination_criteria.EpochCounter {
+                        "max_epochs": 200
+                    }
+                ]
+            },
+            "update_callbacks": !obj:pylearn2.training_algorithms.sgd.ExponentialDecay {
+            "decay_factor": 1.00004,
+            "min_lr": .000001
+        }
+    },
+    "extensions": [
+        !obj:pylearn2.training_algorithms.learning_rule.MomentumAdjustor {
+            "start": 1,
+            "saturate": 250,
+            "final_momentum": .7
+        }
+    ]
+}
