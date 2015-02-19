@@ -2,10 +2,10 @@ from scipy import fftpack
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-import radialProfile
 
 from pylearn2.utils import serial
 
+import radialProfile
 from vanhateren import DATA_DIR, VANHATEREN
 
 
