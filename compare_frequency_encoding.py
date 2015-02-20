@@ -1,7 +1,10 @@
 
 if __name__ == "__main__":
     import os
+    import sys
     import tempfile
+
+    plotting_param = sys.argv[1] if len(sys.argv) > 1 else True
 
     hemi_params = {
         'left':  {'sigma': [[5, 0], [0, 5]]},
@@ -44,4 +47,4 @@ if __name__ == "__main__":
 
     # Analyze frequency information
     from de.fft_analyze import hemisphericalDifferences
-    hemisphericalDifferences('left.pkl', 'right.pkl')
+    hemisphericalDifferences('left.pkl', 'right.pkl', plotting=plotting_param)
