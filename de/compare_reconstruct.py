@@ -4,16 +4,16 @@ import matplotlib.cm as cm
 
 from pylearn2.utils import serial
 
-from vanhateren import DATA_DIR, VANHATEREN
+from .datasets import VanHateren
 
 
-def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
+def compare_reconstruction(model_path='sparserf.pkl', img_file_path=None,
                            img_idx=None, plt_out=None):
     patch_size = (32, 32)
 
     print("Loading the training set...")
-    train_img = os.path.join(DATA_DIR, 'train.pkl')
-    train_set = serial.load(train_img)
+    train_path = os.path.join(VanHateren.DATA_DIR, 'train.pkl')
+    train_set = serial.load(train_path)
 
     # Grab an image patch
     if img_idx is None:
@@ -56,4 +56,4 @@ def compare_reconstruction(model_path='savedata.pkl', img_file_path=None,
 
 if __name__ == '__main__':
     import sys
-    compare_reconstruction(model_path='savedata.pkl')
+    compare_reconstruction(model_path='sparserf.pkl')
