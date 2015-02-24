@@ -12,7 +12,6 @@ from de.datasets import VanHateren
 def fft2(image):
     freq = fftpack.fft2(image)
     shifted = fftpack.fftshift(freq)
-    import pdb; pdb.set_trace()
     return np.abs(shifted)
 
 
