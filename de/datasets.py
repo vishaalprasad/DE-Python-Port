@@ -3,6 +3,7 @@ import glob
 import os
 
 import numpy as np
+import scipy.io
 from pylearn2.datasets import dense_design_matrix
 from pylearn2.utils import serial, string_utils
 
@@ -38,6 +39,14 @@ class ImageDataset(dense_design_matrix.DenseDesignMatrix):
     ALL_LOADERS = {
         '.iml': read_iml, }
 
+    def __init__(self,  axes=('b', 0, 1, 'c'), patch_size=(32, 32), **kwargs):
+        view_converter = dense_design_matrix.DefaultViewConverter(
+            patch_size + (1,),
+            axes)
+        super(ImageDataset, self).__init__(
+            view_converter=view_converter, axes=axes, **kwargs)
+
+
     @classmethod
     def get_image_files(cls, img_dir, filter_fn=lambda *arg: True):
         images = []
@@ -49,7 +58,51 @@ class ImageDataset(dense_design_matrix.DenseDesignMatrix):
                 image_loaders.append(cls.ALL_LOADERS[ext])
         return images, image_loaders
 
-    def __init__(self, which_set, width, height, axes=('b', 0, 1, 'c'),
+
+
+    def normalize_image(self, image_data):
+        return (image_data - self.subtracted_mean) / self.max_val
+
+    def denormalize_image(self, image_data):
+        return (image_data * self.max_val) + self.subtracted_mean
+
+
+    @classmethod
+    def create_datasets(cls, datasets=None, overwrite=False,
+                        output_dir='${PYLEARN2_DATA_PATH}', **kwargs):
+        """Creates the requested datasets, and writes them to disk.
+        """
+        datasets = datasets or cls.ALL_DATASETS
+        serial.mkdir(output_dir)
+
+        for dataset_name in list(datasets):
+            file_path_fn = lambda ext: os.path.join(
+                output_dir,
+                '%s.%s' % (dataset_name, ext))
+
+            output_files = dict([(ext, file_path_fn(ext))
+                                 for ext in ['pkl', 'npy']])
+            files_missing = np.any([not os.path.isfile(f)
+                                    for f in output_files.values()])
+
+            if overwrite or np.any(files_missing):
+                print("Loading the %s data" % dataset_name)
+                dataset = cls(which_set=dataset_name, **kwargs)
+
+                print("Saving the %s data" % dataset_name)
+                dataset.use_design_loc(output_files['npy'])
+                serial.save(output_files['pkl'], dataset)
+
+
+
+
+class VanHateren(ImageDataset):
+
+    DATA_DIR = string_utils.preprocess('${PYLEARN2_DATA_PATH}/vanhateren')
+    VH_WIDTH = 1536
+    VH_HEIGHT = 1024
+
+    def __init__(self, which_set, width = VH_WIDTH, height = VH_HEIGHT,
                  patch_size=(32, 32), img_dir=None, ntrain=200,
                  ntest=25, nvalid=25):
 
@@ -80,7 +133,6 @@ class ImageDataset(dense_design_matrix.DenseDesignMatrix):
             img_indices = ntrain + np.arange(0, ntest)
         elif which_set == 'valid':
             img_indices = ntrain + ntest + np.arange(0, nvalid)
-
         X = np.empty((len(img_indices), self.img_size))
 
         # Take 250 images, convert to 32x32, store in X
@@ -97,80 +149,63 @@ class ImageDataset(dense_design_matrix.DenseDesignMatrix):
         X = X - self.subtracted_mean
         self.max_val = np.abs(X).max(axis=0)
         X = X / self.max_val
-
-        view_converter = dense_design_matrix.DefaultViewConverter(
-            patch_size + (1,),
-            axes)
-
-        super(VanHateren, self).__init__(
-            X=X,
-            view_converter=view_converter,
-            axes=axes)
-
-    def normalize_image(self, image_data):
-        return (image_data - self.subtracted_mean) / self.max_val
-
-    def denormalize_image(self, image_data):
-        return (image_data * self.max_val) + self.subtracted_mean
-
-
-
-class VanHateren(ImageDataset):
-
-    DATA_DIR = string_utils.preprocess('${PYLEARN2_DATA_PATH}/vanhateren')
-    VH_WIDTH = 1536
-    VH_HEIGHT = 1024
-
-    def __init__(self, **kwargs):
-        super(VanHateren, self).__init__(
-            width=self.VH_WIDTH,
-            height=self.VH_HEIGHT,
-            **kwargs)
+        super(VanHateren, self).__init__(X=X, patch_size=patch_size)
 
     @classmethod
     def create_datasets(cls, datasets=None, overwrite=False,
                         img_dir=DATA_DIR, output_dir=DATA_DIR):
-        """Creates the requested datasets, and writes them to disk.
-        """
-        datasets = datasets or cls.ALL_DATASETS
-        serial.mkdir(output_dir)
 
-        for dataset_name in list(datasets):
-            file_path_fn = lambda ext: os.path.join(
-                output_dir,
-                '%s.%s' % (dataset_name, ext))
-
-            output_files = dict([(ext, file_path_fn(ext))
-                                 for ext in ['pkl', 'npy']])
-            files_missing = np.any([not os.path.isfile(f)
-                                    for f in output_files.values()])
-
-            if overwrite or np.any(files_missing):
-                print("Loading the %s data" % dataset_name)
-                dataset = cls(which_set=dataset_name, img_dir=img_dir)
-
-                print("Saving the %s data" % dataset_name)
-                dataset.use_design_loc(output_files['npy'])
-                serial.save(output_files['pkl'], dataset)
+        super(VanHateren, cls).create_datasets(datasets=datasets,
+            overwrite=overwrite, img_dir=img_dir, output_dir=output_dir)
 
 
-##class DEDataset(dense_design_matrix.DenseDesignMatrix):
-    """
-    X: encoded values of some image set.
-    Y: classification values.
+class Sergent(ImageDataset):
 
-    Contains a SparseRFAutoencoder object, which it trains on
-    the VanHateren dataset.
-    """
-"""
-    def __init__(self, which_set, encoder, image_dataset
-                 axes=('b', 0, 1, 'c'),
-                 patch_size=(32, 32), img_dir=None, ntrain=200,
-                 ntest=25, nvalid=25):
-        self.encoder = encoder
-        X = encoder.encode(image_dataset)
-        Y = np.ones((X.shape[0],))
-        super(VanHateren, self).__init__(X=X, Y=Y, **kwargs)
-"""
+    DATA_DIR = string_utils.preprocess('${PYLEARN2_DATA_PATH}/sergent')
+    WIDTH = 34
+    HEIGHT = 25
+    def __init__(self, which_set='train', **kwargs):
+        file_path = os.path.join(os.path.dirname(__file__),
+                "data_sergent.mat")
+        mat = scipy.io.loadmat(file_path)
+        images = mat['train'][0][0][0]
+        image_size = (25, 34)
+        patch_size = (32,32)
+        height = image_size[1]
+        width = image_size[0]
+        reshaped_list = []
+
+        classifier_outputs = mat['train'][0][0][5]
+
+        classifier_labels = mat['train'][0][0][6]
+        classifier_labels = np.asarray([lbl[0][0] for lbl in classifier_labels])
+        image = images[0]
+
+        for image in images.T:
+            reshaped = np.reshape(image, image_size)
+            reshaped = reshaped.T[1:height-1]
+            square = np.zeros(patch_size)
+            square[:,3:28] = reshaped
+            reshaped_list.append(square.flatten())
+        self.y_labels = classifier_labels.T; #will need this later
+        super(Sergent, self).__init__(
+            X=np.asarray(reshaped_list),
+            y=classifier_outputs.astype(float).T,
+            #y_labels=classifier_labels,
+            patch_size=patch_size
+            )
+
+    @classmethod
+    def create_datasets(cls, datasets=['train'], overwrite=False,
+                        output_dir=DATA_DIR):
+
+        super(Sergent, cls).create_datasets(datasets=datasets,
+            overwrite=overwrite, output_dir=output_dir)
+
+
+
+
 if __name__ == "__main__":
-    VanHateren.create_datasets(overwrite=True)
+    #VanHateren.create_datasets(overwrite=True)
+    Sergent.create_datasets(overwrite=True)
+
