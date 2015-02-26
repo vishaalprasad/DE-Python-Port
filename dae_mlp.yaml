@@ -1,16 +1,15 @@
 !obj:pylearn2.train.Train {
-        "dataset": !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/train.pkl",
+        "dataset": !pkl: "${PYLEARN2_DATA_PATH}/sergent/train.pkl",
         "model": !obj:pylearn2.models.mlp.MLP {
-           "batch_size": %(batch_size)i,
+            "batch_size": 16,
             "layers": [
                  !obj:pylearn2.models.mlp.PretrainedLayer {
                      "layer_name": 'h1',
-                     "layer_content": !pkl: "savedata.pkl",
+                     "layer_content": !pkl: "sparserf_example.pkl",
                  },
                  !obj:pylearn2.models.mlp.Softmax {
-                     "max_col_norm": 1.9365,
                      "layer_name": 'y',
-                     "n_classes": 10,
+                     "n_classes": 1,
                      "irange": .005
                  }
                 ],
@@ -23,19 +22,13 @@
             },
             "monitoring_dataset":
                 {
-                    'test'  : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/test.pkl",
-                    'valid' : !pkl: "${PYLEARN2_DATA_PATH}/vanhateren/valid.pkl",
+                    'monitor'  : !pkl: "${PYLEARN2_DATA_PATH}/sergent/train.pkl",
                 },        
             "cost": !obj:pylearn2.costs.mlp.Default {},
             "termination_criterion": !obj:pylearn2.termination_criteria.And {
                 "criteria": [
-                    !obj:pylearn2.termination_criteria.MonitorBased {
-                        "channel_name": "valid_y_misclass",
-                        "prop_decrease": 0.,
-                        "N": 100
-                    },
                     !obj:pylearn2.termination_criteria.EpochCounter {
-                        "max_epochs": 200
+                        "max_epochs": 5 
                     }
                 ]
             },
