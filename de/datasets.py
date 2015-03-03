@@ -58,7 +58,6 @@ class ImageDataset(dense_design_matrix.DenseDesignMatrix):
             "'test' or 'valid'"
 
         # We define here:
-        self.axes = axes
         self.img_shape = patch_size
         self.img_size = np.prod(patch_size)
         self.img_dir = img_dir
