@@ -16,7 +16,7 @@
             "imageSize" : [32, 32],
 
         },
-        algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
+        "algorithm": !obj:pylearn2.training_algorithms.sgd.SGD {
             "learning_rule": !obj:pylearn2.training_algorithms.learning_rule.Momentum {
                 "init_momentum": 0.9
             },
