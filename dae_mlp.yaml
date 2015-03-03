@@ -7,6 +7,10 @@
                      "layer_name": 'h1',
                      "layer_content": !pkl: "sparserf_example.pkl",
                  },
+                 !obj:pylearn2.models.mlp.PretrainedLayer {
+                     "layer_name": 'h2',
+                     "layer_content": !pkl: "/raid/vprasad/NN-Research/dae_l2.pkl",
+                 },
                  !obj:pylearn2.models.mlp.Softmax {
                      "layer_name": 'y',
                      "n_classes": 1,
@@ -28,7 +32,7 @@
             "termination_criterion": !obj:pylearn2.termination_criteria.And {
                 "criteria": [
                     !obj:pylearn2.termination_criteria.EpochCounter {
-                        "max_epochs": 5 
+                        "max_epochs": 50 
                     }
                 ]
             },
@@ -43,5 +47,7 @@
             "saturate": 250,
             "final_momentum": .7
         }
-    ]
+    ],
+    "save_path": 'final.pkl',
+    "save_freq": 50
 }
