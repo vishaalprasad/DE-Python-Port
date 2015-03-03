@@ -1,6 +1,6 @@
-import sys;
-sys.path = ['/raid/vprasad/pylearn2'] + sys.path
-if __name__ == "__main__":
+import sys; sys.path = ['/raid/vprasad/pylearn2'] + sys.path
+
+def create_layer2():
     import tempfile
 
     # Create the dataset
@@ -20,10 +20,5 @@ if __name__ == "__main__":
     from pylearn2.scripts.train import train
     train(config=config_fn)
 
-    # Visualize the weights
-    #from pylearn2.scripts.show_weights import show_weights
-   # show_weights(model_path=weights_file, border=True)
-
-    # Visualize the reconstruction
-   # from de.compare_reconstruct import compare_reconstruction
-   #compare_reconstruction(model_path=weights_file)
+if __name__ == "__main__":
+   create_layer2();

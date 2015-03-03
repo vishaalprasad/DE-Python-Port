@@ -1,9 +1,9 @@
+import sys; sys.path = ['/raid/vprasad/pylearn2'] + sys.path
 
-if __name__ == "__main__":
+def create_sparserf(numcons, sigma, weights_file):
     import tempfile
 
-    weights_file = 'sparserf_example.pkl'
-    params = (10, [[3, 0], [0, 3]], weights_file)
+    params = (numcons, sigma, weights_file)
 
     # Create the dataset
     from de.datasets import VanHateren
@@ -28,3 +28,7 @@ if __name__ == "__main__":
     # Visualize the reconstruction
     from de.compare_reconstruct import compare_reconstruction
     compare_reconstruction(model_path=weights_file)
+
+
+if __name__ == "__main__":
+    create_sparserf(10, [[3, 0], [0, 3]], 'sparserf_example.pkl')
