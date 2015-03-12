@@ -146,7 +146,7 @@ class SparseRFAutoencoder(DenoisingAutoencoder):
 
         return connectionMatrix
 
-    @functools.wraps(Model._modify_updates)
+   # @functools.wraps(Model._modify_updates)
     def _modify_updates(self, updates):
         W = self.weights
         if W in updates:
