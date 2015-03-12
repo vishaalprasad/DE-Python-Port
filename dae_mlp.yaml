@@ -5,7 +5,7 @@
             "layers": [
                  !obj:pylearn2.models.mlp.PretrainedLayer {
                      "layer_name": 'h1',
-                     "layer_content": !pkl: "sparserf_example.pkl",
+                     "layer_content": !pkl: "%(pkl_file)s",
                  },
                  !obj:pylearn2.models.mlp.Sigmoid {
                      "layer_name": 'h2',
@@ -49,6 +49,6 @@
             "final_momentum": .7
         }
     ],
-    "save_path": 'final.pkl',
+    "save_path": '%(save_path)s',
     "save_freq": 50
 }
