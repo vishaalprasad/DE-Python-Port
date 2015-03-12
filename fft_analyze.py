@@ -6,27 +6,28 @@ import os
 from pylearn2.utils import serial
 
 import radialProfile
-from vanhateren import DATA_DIR, VANHATEREN
+from de.datasets import VanHateren
 
 
 def fft2(image):
     freq = fftpack.fft2(image)
     shifted = fftpack.fftshift(freq)
-    return np.abs(shifted)
+    return shifted
 
 
 def fft2AverageOnImageSet(images):
     # Requires images to be of the same shape.
     total_frequency = np.zeros((images[0].shape))
     for image in images:
-        total_frequency = np.add(total_frequency, fft2(image))
-    return total_frequency / float(len(images))
+        total_frequency = np.add(total_frequency, image)
+    total_frequency / float(len(images))
+    total_frequency = fft2(total_frequency)
+    return np.abs(total_frequency)
 
 
 # A function that performs an fft analysis of an image and its reconstruction
 # and plots the analyses for purposes of visualization.
-def singleImageAnalysis(model_path):
-
+def singleImageAnalysis(model_path, DATA_DIR):
     print("Loading the training set...")
     train_img = os.path.join(DATA_DIR, 'train.pkl')
     train_set = serial.load(train_img)
@@ -89,7 +90,7 @@ def singleImageAnalysis(model_path):
 
 # A function that helps visualize the differences between each
 # hemispherical representation of a set of images.
-def hemisphericalDifferences(left_model_path, right_model_path):
+def hemisphericalDifferences(left_model_path, right_model_path, DATA_DIR):
     print("Loading the training set...")
     train_img = os.path.join(DATA_DIR, 'train.pkl')
     train_set = serial.load(train_img)
@@ -105,7 +106,7 @@ def hemisphericalDifferences(left_model_path, right_model_path):
     list_of_left_reconstructed = []
     list_of_right_reconstructed = []
 
-    print("Beginning the fft analysis...")
+    print("Reconstructing the images...")
 
     # Go through all the images and add them to the lists
     for ii in np.arange(train_set.X.shape[0]):
@@ -130,6 +131,7 @@ def hemisphericalDifferences(left_model_path, right_model_path):
 
         list_of_right_reconstructed.append(reconstructed_patch)
 
+    print("Running fft analysis...")
     # Run 2D Analysis
     average_frequency = fft2AverageOnImageSet(list_of_images)
     average_left_reconstructed = fft2AverageOnImageSet(
@@ -179,4 +181,4 @@ def hemisphericalDifferences(left_model_path, right_model_path):
 
 if __name__ == '__main__':
     # singleImageAnalysis('savedata.pkl')
-    hemisphericalDifferences('left.pkl', 'right.pkl')
+    hemisphericalDifferences('left.pkl', 'right.pkl', VanHateren.DATA_DIR)
