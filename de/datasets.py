@@ -168,16 +168,16 @@ class Sergent(ImageDataset):
         file_path = os.path.join(os.path.dirname(__file__),
                 "data_sergent.mat")
         mat = scipy.io.loadmat(file_path)
-        images = mat['train'][0][0][0]
+        images = mat[which_set][0][0][0]
         image_size = (25, 34)
         patch_size = (32,32)
         height = image_size[1]
         width = image_size[0]
         reshaped_list = []
 
-        classifier_outputs = mat['train'][0][0][5]
+        classifier_outputs = mat[which_set][0][0][5]
 
-        classifier_labels = mat['train'][0][0][6]
+        classifier_labels = mat[which_set][0][0][6]
         classifier_labels = np.asarray([lbl[0][0] for lbl in classifier_labels])
         image = images[0]
 
