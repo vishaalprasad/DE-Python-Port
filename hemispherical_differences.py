@@ -6,7 +6,8 @@ from pylearn2.utils import serial
 
 import fft_analyze as fft
 import radialProfile
-from vanhateren import DATA_DIR, VANHATEREN
+from de.datasets import VanHateren
+DATA_DIR = VanHateren.DATA_DIR
 
 if __name__ == '__main__':
 
