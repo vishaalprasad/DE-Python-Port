@@ -102,9 +102,9 @@ class VanHateren(ImageDataset):
     VH_WIDTH = 1536
     VH_HEIGHT = 1024
 
-    def __init__(self, which_set, width = VH_WIDTH, height = VH_HEIGHT,
+    def __init__(self, which_set, width=VH_WIDTH, height=VH_HEIGHT,
                  patch_size=(32, 32), img_dir=None, ntrain=200,
-                 ntest=25, nvalid=25):
+                 ntest=25, nvalid=25, axes=None):
 
         assert which_set in self.ALL_DATASETS, \
             "Set specified is not a valid set. Please use 'train' or " \
