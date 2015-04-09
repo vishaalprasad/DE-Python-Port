@@ -1,20 +1,23 @@
-def create_classifier(pkl_file, save_path):
+from pylearn2.config import yaml_parse
+
+from de.datasets import Sergent
+from de import sparserf_autoencoder
+
+
+def create_classifier(autoencoder_path, save_path,
+                      mlp_template='dae_mlp.yaml'):
     # Create the dataset
-    from de.datasets import Sergent
-    from de import sparserf_autoencoder
     Sergent.create_datasets(overwrite=True)
 
     # Train the network.
-    #from pylearn2.scripts.train import train
+    hyper_params = {'pkl_file': autoencoder_path,
+                    'save_path': save_path}
+    with open(mlp_template, 'r') as fp:
+        layer1_yaml = fp.read() % hyper_params
 
-    layer1_yaml = open('dae_mlp.yaml', 'r').read()
-    hyper_params = {'pkl_file' : pkl_file,
-                    'save_path' : save_path}
-    layer1_yaml = layer1_yaml % hyper_params
-    from pylearn2.config import yaml_parse
     train = yaml_parse.load(layer1_yaml)
     train.main_loop()
-    #train(config=layer1_yaml)
+
 
 if __name__ == "__main__":
     create_classifier("sparserf_example.pkl", "final.pkl")
