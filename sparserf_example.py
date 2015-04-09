@@ -1,9 +1,14 @@
 import sys; sys.path = ['/raid/vprasad/pylearn2'] + sys.path
 
-def create_sparserf(numcons, sigma, weights_file):
+from pylearn2.scripts.show_weights import show_weights
+
+from de.compare_reconstruct import compare_reconstruction
+
+
+def create_sparserf(num_cons, sigma, weights_file, verbosity=1):
     import tempfile
 
-    params = (numcons, sigma, weights_file)
+    params = (num_cons, sigma, weights_file)
 
     # Create the dataset
     from de.datasets import VanHateren
@@ -22,12 +27,12 @@ def create_sparserf(numcons, sigma, weights_file):
     train(config=config_fn)
 
     # Visualize the weights
-    from pylearn2.scripts.show_weights import show_weights
-    show_weights(model_path=weights_file, border=True)
+    if verbosity > 0:
+        show_weights(model_path=weights_file, border=True)
 
     # Visualize the reconstruction
-    from de.compare_reconstruct import compare_reconstruction
-    compare_reconstruction(model_path=weights_file)
+    if verbosity > 0:
+        compare_reconstruction(model_path=weights_file)
 
 
 if __name__ == "__main__":

@@ -47,10 +47,12 @@ if __name__ == "__main__":
     from sparserf_example import create_sparserf
     from dae_mlp import create_classifier
 
-    create_sparserf(10, [[4, 0], [0, 4]], 'left_hemisphere.pkl')
+    create_sparserf(num_cons=10, sigma=[[4, 0], [0, 4]],
+                    weights_file='left_hemisphere.pkl', verbosity=0)
     create_classifier('left_hemisphere.pkl', 'left_final.pkl')
 
-    create_sparserf(10, [[3, 0], [0, 3]], 'right_hemisphere.pkl')
+    create_sparserf(num_cons=10, sigma=[[2, 0], [0, 2]],
+                    weights_file='right_hemisphere.pkl', verbosity=0)
     create_classifier('right_hemisphere.pkl', 'right_final.pkl')
 
     show_results('left_final.pkl', 'right_final.pkl')
