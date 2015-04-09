@@ -5,7 +5,7 @@ from de import sparserf_autoencoder
 
 
 def create_classifier(autoencoder_path, save_path,
-                      mlp_template='dae_mlp.yaml'):
+                      mlp_template='classifier.yaml'):
     # Create the dataset
     Sergent.create_datasets(overwrite=True)
 

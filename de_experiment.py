@@ -45,7 +45,7 @@ def show_results(left_mlp_pkl, right_mlp_pkl):
 
 if __name__ == "__main__":
     from sparserf_example import create_sparserf
-    from dae_mlp import create_classifier
+    from classifier import create_classifier
 
     create_sparserf(num_cons=10, sigma=[[4, 0], [0, 4]],
                     weights_file='left_hemisphere.pkl', verbosity=0)
