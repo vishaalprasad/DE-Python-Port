@@ -1,12 +1,12 @@
-from scipy import fftpack
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import os
+from scipy import fftpack
 
 from pylearn2.utils import serial
 
-import radialProfile
-from de.datasets import VanHateren
+from .datasets import VanHateren
+from .externals import radial_profile
 
 
 def fft2(image):
@@ -72,8 +72,8 @@ def singleImageAnalysis(model_path, DATA_DIR):
     plt.savefig('fft2D.png')
     os.system('eog fft2D.png &')
 
-    psd1D = radialProfile.azimuthalAverage(average_frequency)
-    reconstructed_psd1D = radialProfile.azimuthalAverage(average_reconstructed)
+    psd1D = radial_profile.azimuthalAverage(average_frequency)
+    reconstructed_psd1D = radial_profile.azimuthalAverage(average_reconstructed)
 
     fg = plt.figure()
     fg.add_subplot(1, 2, 1)
@@ -142,11 +142,11 @@ def hemisphericalDifferences(left_model_path, right_model_path, DATA_DIR):
         )
 
     # Run 1D Analysis
-    psd1D = radialProfile.azimuthalAverage(average_frequency)
-    reconstructed_left_psd1D = radialProfile.azimuthalAverage(
+    psd1D = radial_profile.azimuthalAverage(average_frequency)
+    reconstructed_left_psd1D = radial_profile.azimuthalAverage(
         average_left_reconstructed
         )
-    reconstructed_right_psd1D = radialProfile.azimuthalAverage(
+    reconstructed_right_psd1D = radial_profile.azimuthalAverage(
         average_right_reconstructed
         )
 
