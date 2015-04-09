@@ -12,19 +12,22 @@ from de.datasets import Sergent
 
 def collect_results(model_path):
     try:
+        print("Loading model from %s..." % model_path)
         model = serial.load(model_path)
     except Exception, e:
         print "Error while loading model path %s: %s" % (model_path, e)
         raise
 
-    imgs = serial.load("sergent.pkl")
+    data_path = os.path.join(Sergent.DATA_DIR, "train.pkl")
+    print("Loading Sergent dataset from %s..." % data_path)
+    dataset = serial.load(data_path)
 
-    X = model.get_input_space().make_batch_theano(batch_size=imgs.shape[0])
+    X = model.get_input_space().make_batch_theano(batch_size=dataset.X.shape[0])
     Y = model.fprop(X)
     Y = T.argmax(Y, axis=1)
     f = function([X], Y)
 
-    y = f(imgs)
+    y = f(dataset.X)
 
     return model, y
 
